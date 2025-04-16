@@ -47,7 +47,7 @@ dotnet run
 4. Acesse a aplicação no navegador:
 
 ```
-https://localhost:5144
+http://localhost:5144
 ```
 
 ## Equipe de Desenvolvimento
