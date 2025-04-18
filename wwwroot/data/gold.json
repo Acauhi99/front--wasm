@@ -1,0 +1,19 @@
+{
+  "goldPackages": [
+    {
+      "goldAmount": 10000,
+      "price": 19.90,
+      "isPopular": false
+    },
+    {
+      "goldAmount": 100000,
+      "price": 149.90,
+      "isPopular": true
+    },
+    {
+      "goldAmount": 500000,
+      "price": 599.90,
+      "isPopular": false
+    }
+  ]
+}
