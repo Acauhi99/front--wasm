@@ -799,6 +799,16 @@
       }
     }
   }
+  .md\:h-15 {
+    @media (width >= 48rem) {
+      height: calc(var(--spacing) * 15);
+    }
+  }
+  .md\:h-16 {
+    @media (width >= 48rem) {
+      height: calc(var(--spacing) * 16);
+    }
+  }
   .md\:h-18 {
     @media (width >= 48rem) {
       height: calc(var(--spacing) * 18);
