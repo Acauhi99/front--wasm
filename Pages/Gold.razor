@@ -1,4 +1,5 @@
 @page "/gold"
+@using front__wasm.Shared
 
 <ServiceTemplate 
   Title="Serviços de Gold" 
@@ -64,45 +65,39 @@
   </LeftContent>
   <RightContent>
     <div class="bg-white rounded-lg shadow-lg p-8 border border-gray-200">
-      <h3 class="text-2xl font-bold mb-6 text-center">Escolha seu pacote</h3>
-      <div class="space-y-4">
-        <div
-          class="border border-gray-200 rounded-lg p-4 hover:border-blue-500 cursor-pointer transition">
-          <div class="flex justify-between items-center">
-            <span class="font-bold">10.000 Gold</span>
-            <span class="text-xl font-bold">R$ 19,90</span>
-          </div>
+        <h3 class="text-2xl font-bold mb-6 text-center">Escolha seu pacote</h3>
+        <div class="space-y-4">
+            @if (goldPackages == null)
+            {
+                <p>Carregando pacotes...</p>
+            }
+            else
+            {
+                @foreach (var package in goldPackages)
+                {
+                    <GoldPackageCard 
+                        GoldAmount="@package.GoldAmount" 
+                        Price="@package.Price" 
+                        IsPopular="@package.IsPopular" 
+                        OnAddToCart="() => AddToCart(package)" />
+                }
+            }
         </div>
-        <div
-          class="border border-gray-200 rounded-lg p-4 hover:border-blue-500 cursor-pointer transition bg-blue-50">
-          <div class="flex justify-between items-center">
-            <div>
-              <span class="font-bold">100.000 Gold</span>
-              <span class="bg-green-500 text-white text-xs px-2 py-1 rounded-full ml-2"
-                >Mais Popular</span
-              >
-            </div>
-            <span class="text-xl font-bold">R$ 149,90</span>
-          </div>
-        </div>
-        <div
-          class="border border-gray-200 rounded-lg p-4 hover:border-blue-500 cursor-pointer transition">
-          <div class="flex justify-between items-center">
-            <span class="font-bold">500.000 Gold</span>
-            <span class="text-xl font-bold">R$ 599,90</span>
-          </div>
-        </div>
-      </div>
-      <div class="mt-8">
-        <button
-          class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 mb-4">
-          Adicionar ao Carrinho
-        </button>
-        <button
-          class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
-          Comprar Agora
-        </button>
-      </div>
     </div>
   </RightContent>
 </ServiceTemplate>
+
+@code {
+    private IEnumerable<GoldPackage>? goldPackages;
+
+    protected override async Task OnInitializedAsync()
+    {
+        goldPackages = await CatalogService.GetGoldPackagesAsync();
+    }
+
+    private void AddToCart(GoldPackage package)
+    {
+        Console.WriteLine($"Added to cart: {package.GoldAmount} Gold for R$ {package.Price}");
+        // Add logic to update the cart
+    }
+}
