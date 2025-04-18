@@ -1,104 +1,114 @@
 ﻿@page "/"
 @layout Layout.MainLayout
+@using front__wasm.Models
+@using front__wasm.Services
+@inject CatalogService CatalogService
 
-<div class="bg-gradient-to-b from-purple-900 to-blue-900 text-white py-20">
-  <div class="container mx-auto px-4 text-center">
-    <h1 class="text-6xl font-bold mb-4">WoW Services</h1>
+<div class="relative bg-gradient-to-b from-yellow-900 to-purple-900 text-white py-30 overflow-hidden">
+
+  <div class="absolute inset-0 z-0">
+    <img src="images/splash1.png" alt="Fundo WoW" class="w-full h-full object-cover opacity-30" />
+  </div>
+
+  <div class="relative z-10 container mx-auto px-4 text-center">
+    <h1 class="text-6xl font-bold mb-4">World of Warcraft Auction House</h1>
     <p class="text-xl mb-8 max-w-3xl mx-auto">
       Eleve sua experiência em World of Warcraft com nossos serviços premium. Ouro, Dungeons, Raids,
       PvP e muito mais para garantir seu sucesso em Azeroth!
     </p>
     <a
       href="/catalog"
-      class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg text-lg transition duration-300">
+      class="bg-blue-700 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg text-lg transition duration-300">
       Ver Catálogo
     </a>
   </div>
 </div>
 
-<div class="container mx-auto px-4 py-16">
+<div class="bg-[#11110c] text-white py-16">
+<div class="container mx-auto px-4 py-7">
   <h2 class="text-4xl font-bold text-center mb-12">Serviços em Destaque</h2>
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-    <div
-      class="bg-gray-800 rounded-lg overflow-hidden shadow-lg transition duration-300 hover:scale-105">
-      <img
-        src="https://via.placeholder.com/600x300?text=Gold+Farming"
-        alt="Gold Farming"
-        class="w-full h-48 object-cover" />
-      <div class="p-6">
-        <h3 class="text-xl font-bold text-white mb-2">Gold Farming</h3>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+  @if (services == null)
+  {
+    <p class="text-center col-span-3">Carregando serviços...</p>
+  }
+  else if (!services.Any())
+  {
+    <p class="text-center col-span-3">Nenhum serviço disponível no momento.</p>
+  }
+  else
+  {
+    @foreach (var service in services
+    .Where(s => s.Title == "Gold Services" || s.Title == "Mythic+ Dungeons" || s.Title == "Raid Boosting"))
+    {
+      var glowColor = service.Title switch
+        {
+          "Gold Services" => "#f1c533",        
+          "Mythic+ Dungeons" => "red",    
+          "Raid Boosting" => "purple"                      
+        };
+      <ServiceDestaque 
+        ImageUrl="@service.ImageUrl"
+        ImageAlt="@service.ImageAlt"
+        Title="@service.Title"
+        Description="@service.Description" 
+        DetailsUrl="@service.DetailsUrl"
+        GlowColor="@glowColor"/>
+    }
+  }
+</div>
+</div>
+</div>
+
+<div class="bg-gradient-to-b from-purple-900 to-blue-900 text-white py-16">
+  <div class="container mx-auto px-4">
+    <h2 class="text-4xl font-bold text-center mb-12">Avaliações de Clientes</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      
+      <div class="bg-[#1c1c18] p-6 rounded-lg shadow-md">
+        <div class="flex text-yellow-400 mb-4">
+          <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+        </div>
         <p class="text-gray-300 mb-4">
-          Receba ouro rapidamente para financiar suas aventuras em Azeroth
+          "Serviço excepcional! Consegui todo o ouro que precisava em apenas algumas horas. Super
+          recomendo!"
         </p>
-        <a href="/gold" class="text-blue-400 hover:text-blue-500">Saiba mais →</a>
+        <p class="font-bold text-white">- Anduin_Wrynn</p>
       </div>
-    </div>
-    <div
-      class="bg-gray-800 rounded-lg overflow-hidden shadow-lg transition duration-300 hover:scale-105">
-      <img
-        src="https://via.placeholder.com/600x300?text=Mythic+Dungeons"
-        alt="Mythic Dungeons"
-        class="w-full h-48 object-cover" />
-      <div class="p-6">
-        <h3 class="text-xl font-bold text-white mb-2">Mythic+ Dungeons</h3>
+
+      <div class="bg-[#1c1c18] p-6 rounded-lg shadow-md">
+        <div class="flex text-yellow-400 mb-4">
+          <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+        </div>
         <p class="text-gray-300 mb-4">
-          Conquiste as masmorras mais desafiadoras com nosso time profissional
+          "O boost de Mythic+ foi perfeito. A equipe foi muito profissional e consegui todos os
+          itens que queria."
         </p>
-        <a href="/dungeons" class="text-blue-400 hover:text-blue-500">Saiba mais →</a>
+        <p class="font-bold text-white">- Sylvanas_Dark</p>
       </div>
-    </div>
-    <div
-      class="bg-gray-800 rounded-lg overflow-hidden shadow-lg transition duration-300 hover:scale-105">
-      <img
-        src="https://via.placeholder.com/600x300?text=Raid+Boosting"
-        alt="Raid Boosting"
-        class="w-full h-48 object-cover" />
-      <div class="p-6">
-        <h3 class="text-xl font-bold text-white mb-2">Raid Boosting</h3>
+
+      <div class="bg-[#1c1c18] p-6 rounded-lg shadow-md">
+        <div class="flex text-yellow-400 mb-4">
+          <span>★</span><span>★</span><span>★</span><span>★</span>
+          <span class="text-gray-500">★</span>
+        </div>
         <p class="text-gray-300 mb-4">
-          Derrote os chefes mais difíceis e consiga os melhores equipamentos
+          "O serviço de raid foi ótimo, completei toda a raid em tempo recorde. Só demorou um pouco
+          para começar."
         </p>
-        <a href="/raids" class="text-blue-400 hover:text-blue-500">Saiba mais →</a>
+        <p class="font-bold text-white">- Thrall_Durotan</p>
       </div>
+
     </div>
   </div>
 </div>
 
-<div class="bg-gray-100 py-16">
-  <div class="container mx-auto px-4">
-    <h2 class="text-4xl font-bold text-center mb-12">Avaliações de Clientes</h2>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <div class="bg-white p-6 rounded-lg shadow-md">
-        <div class="flex text-yellow-400 mb-4">
-          <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
-        </div>
-        <p class="text-gray-600 mb-4">
-          "Serviço excepcional! Consegui todo o ouro que precisava em apenas algumas horas. Super
-          recomendo!"
-        </p>
-        <p class="font-bold">- Anduin_Wrynn</p>
-      </div>
-      <div class="bg-white p-6 rounded-lg shadow-md">
-        <div class="flex text-yellow-400 mb-4">
-          <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
-        </div>
-        <p class="text-gray-600 mb-4">
-          "O boost de Mythic+ foi perfeito. A equipe foi muito profissional e consegui todos os
-          itens que queria."
-        </p>
-        <p class="font-bold">- Sylvanas_Dark</p>
-      </div>
-      <div class="bg-white p-6 rounded-lg shadow-md">
-        <div class="flex text-yellow-400 mb-4">
-          <span>★</span><span>★</span><span>★</span><span>★</span
-          ><span class="text-gray-300">★</span>
-        </div>
-        <p class="text-gray-600 mb-4">
-          "O serviço de raid foi ótimo, completei toda a raid em tempo recorde. Só demorou um pouco
-          para começar."
-        </p>
-        <p class="font-bold">- Thrall_Durotan</p>
-      </div>
-    </div>
-  </div>
-</div>
+@code {
+  private IEnumerable<Service> services = new List<Service>();
+
+  protected override async Task OnInitializedAsync()
+  {
+    services = await CatalogService.GetServicesAsync();
+  }
+}
+
