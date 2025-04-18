@@ -1,154 +1,145 @@
 @page "/itens"
 
-<div class="bg-gradient-to-r from-green-700 to-teal-600 py-16">
-  <div class="container mx-auto px-4 text-center">
-    <h1 class="text-5xl font-bold text-white mb-4">Itens Especiais</h1>
-    <p class="text-xl text-white mb-8 max-w-3xl mx-auto">
-      Obtenha os itens mais raros e cobiçados do jogo. Armas legendárias, montarias raras, transmogs
-      exclusivos e muito mais.
-    </p>
-  </div>
-</div>
+<ServiceTemplate 
+  Title="Itens Especiais" 
+  Description="Obtenha os itens mais raros e cobiçados do jogo. Armas legendárias, montarias raras, transmogs exclusivos e muito mais."
+  GradientClasses="from-green-700 to-teal-600">
+  <LeftContent>
+    <h2 class="text-3xl font-bold mb-6">Categorias de Itens Disponíveis</h2>
+    <ul class="space-y-4">
+      <li class="flex items-start">
+        <svg
+          class="h-6 w-6 text-green-600 mr-2"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M5 13l4 4L19 7" />
+        </svg>
+        <span>Montarias raras com chance de drop baixíssima</span>
+      </li>
+      <li class="flex items-start">
+        <svg
+          class="h-6 w-6 text-green-600 mr-2"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M5 13l4 4L19 7" />
+        </svg>
+        <span>Transmogs exclusivos e itens cosméticos</span>
+      </li>
+      <li class="flex items-start">
+        <svg
+          class="h-6 w-6 text-green-600 mr-2"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M5 13l4 4L19 7" />
+        </svg>
+        <span>Armas e equipamentos lendários</span>
+      </li>
+      <li class="flex items-start">
+        <svg
+          class="h-6 w-6 text-green-600 mr-2"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M5 13l4 4L19 7" />
+        </svg>
+        <span>Pets de batalha raros</span>
+      </li>
+      <li class="flex items-start">
+        <svg
+          class="h-6 w-6 text-green-600 mr-2"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M5 13l4 4L19 7" />
+        </svg>
+        <span>Itens de colecionador</span>
+      </li>
+    </ul>
 
-<div class="container mx-auto px-4 py-12">
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-    <div>
-      <h2 class="text-3xl font-bold mb-6">Categorias de Itens Disponíveis</h2>
-      <ul class="space-y-4">
-        <li class="flex items-start">
-          <svg
-            class="h-6 w-6 text-green-600 mr-2"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M5 13l4 4L19 7" />
-          </svg>
-          <span>Montarias raras com chance de drop baixíssima</span>
-        </li>
-        <li class="flex items-start">
-          <svg
-            class="h-6 w-6 text-green-600 mr-2"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M5 13l4 4L19 7" />
-          </svg>
-          <span>Transmogs exclusivos e itens cosméticos</span>
-        </li>
-        <li class="flex items-start">
-          <svg
-            class="h-6 w-6 text-green-600 mr-2"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M5 13l4 4L19 7" />
-          </svg>
-          <span>Armas e equipamentos lendários</span>
-        </li>
-        <li class="flex items-start">
-          <svg
-            class="h-6 w-6 text-green-600 mr-2"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M5 13l4 4L19 7" />
-          </svg>
-          <span>Pets de batalha raros</span>
-        </li>
-        <li class="flex items-start">
-          <svg
-            class="h-6 w-6 text-green-600 mr-2"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M5 13l4 4L19 7" />
-          </svg>
-          <span>Itens de colecionador</span>
-        </li>
-      </ul>
-
+    <div class="mt-8">
+      <h3 class="text-2xl font-bold mb-4">Nosso processo de farm</h3>
+      <p class="mb-4">
+        Utilizamos equipes especializadas que trabalham incansavelmente para obter os itens mais
+        raros do jogo. Alguns itens podem levar dias ou semanas para serem adquiridos devido à sua
+        raridade.
+      </p>
+      <p>
+        Todos os itens são obtidos de forma legítima, seguindo as regras do jogo, garantindo a
+        segurança de sua conta.
+      </p>
+    </div>
+  </LeftContent>
+  <RightContent>
+    <div class="bg-white rounded-lg shadow-lg p-8 border border-gray-200">
+      <h3 class="text-2xl font-bold mb-6 text-center">Itens em Destaque</h3>
+      <div class="space-y-4">
+        <div
+          class="border border-gray-200 rounded-lg p-4 hover:border-green-500 cursor-pointer transition">
+          <div class="flex justify-between items-center">
+            <span class="font-bold">Montaria Rara - Rédeas do Raptor Zandalari</span>
+            <span class="text-xl font-bold">R$ 199,90</span>
+          </div>
+        </div>
+        <div
+          class="border border-gray-200 rounded-lg p-4 hover:border-green-500 cursor-pointer transition bg-green-50">
+          <div class="flex justify-between items-center">
+            <div>
+              <span class="font-bold">Montaria - Cabeça de Al'ar</span>
+              <span class="bg-green-500 text-white text-xs px-2 py-1 rounded-full ml-2"
+                >Mais Popular</span
+              >
+            </div>
+            <span class="text-xl font-bold">R$ 349,90</span>
+          </div>
+        </div>
+        <div
+          class="border border-gray-200 rounded-lg p-4 hover:border-green-500 cursor-pointer transition">
+          <div class="flex justify-between items-center">
+            <span class="font-bold">Set de Transmog - Paladino T3</span>
+            <span class="text-xl font-bold">R$ 299,90</span>
+          </div>
+        </div>
+        <div
+          class="border border-gray-200 rounded-lg p-4 hover:border-green-500 cursor-pointer transition">
+          <div class="flex justify-between items-center">
+            <span class="font-bold">Pacote de 3 Pets Raros</span>
+            <span class="text-xl font-bold">R$ 89,90</span>
+          </div>
+        </div>
+      </div>
       <div class="mt-8">
-        <h3 class="text-2xl font-bold mb-4">Nosso processo de farm</h3>
-        <p class="mb-4">
-          Utilizamos equipes especializadas que trabalham incansavelmente para obter os itens mais
-          raros do jogo. Alguns itens podem levar dias ou semanas para serem adquiridos devido à sua
-          raridade.
-        </p>
-        <p>
-          Todos os itens são obtidos de forma legítima, seguindo as regras do jogo, garantindo a
-          segurança de sua conta.
-        </p>
+        <button
+          class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 mb-4">
+          Adicionar ao Carrinho
+        </button>
+        <button
+          class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
+          Comprar Agora
+        </button>
       </div>
     </div>
-    <div>
-      <div class="bg-white rounded-lg shadow-lg p-8 border border-gray-200">
-        <h3 class="text-2xl font-bold mb-6 text-center">Itens em Destaque</h3>
-        <div class="space-y-4">
-          <div
-            class="border border-gray-200 rounded-lg p-4 hover:border-green-500 cursor-pointer transition">
-            <div class="flex justify-between items-center">
-              <span class="font-bold">Montaria Rara - Rédeas do Raptor Zandalari</span>
-              <span class="text-xl font-bold">R$ 199,90</span>
-            </div>
-          </div>
-          <div
-            class="border border-gray-200 rounded-lg p-4 hover:border-green-500 cursor-pointer transition bg-green-50">
-            <div class="flex justify-between items-center">
-              <div>
-                <span class="font-bold">Montaria - Cabeça de Al'ar</span>
-                <span class="bg-green-500 text-white text-xs px-2 py-1 rounded-full ml-2"
-                  >Mais Popular</span
-                >
-              </div>
-              <span class="text-xl font-bold">R$ 349,90</span>
-            </div>
-          </div>
-          <div
-            class="border border-gray-200 rounded-lg p-4 hover:border-green-500 cursor-pointer transition">
-            <div class="flex justify-between items-center">
-              <span class="font-bold">Set de Transmog - Paladino T3</span>
-              <span class="text-xl font-bold">R$ 299,90</span>
-            </div>
-          </div>
-          <div
-            class="border border-gray-200 rounded-lg p-4 hover:border-green-500 cursor-pointer transition">
-            <div class="flex justify-between items-center">
-              <span class="font-bold">Pacote de 3 Pets Raros</span>
-              <span class="text-xl font-bold">R$ 89,90</span>
-            </div>
-          </div>
-        </div>
-        <div class="mt-8">
-          <button
-            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 mb-4">
-            Adicionar ao Carrinho
-          </button>
-          <button
-            class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
-            Comprar Agora
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+  </RightContent>
+</ServiceTemplate>

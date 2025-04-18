@@ -1,0 +1,42 @@
+[
+  {
+    "imageUrl": "https://via.placeholder.com/600x300?text=Gold+Services",
+    "imageAlt": "Gold Services",
+    "title": "Gold Services",
+    "description": "Adquira ouro rapidamente para suas necessidades no jogo.",
+    "price": "R$ 19,90",
+    "detailsUrl": "/gold"
+  },
+  {
+    "imageUrl": "https://via.placeholder.com/600x300?text=Dungeon+Runs",
+    "imageAlt": "Dungeon Runs",
+    "title": "Mythic+ Dungeons",
+    "description": "Complete desafios de masmorras com nossa equipe experiente.",
+    "price": "R$ 49,90",
+    "detailsUrl": "/dungeons"
+  },
+  {
+    "imageUrl": "https://via.placeholder.com/600x300?text=Raid+Boosting",
+    "imageAlt": "Raid Boosting",
+    "title": "Raid Boosting",
+    "description": "Conquiste as raids mais desafiadoras com nossa ajuda.",
+    "price": "R$ 89,90",
+    "detailsUrl": "/raids"
+  },
+  {
+    "imageUrl": "https://via.placeholder.com/600x300?text=PvP+Services",
+    "imageAlt": "PvP Services",
+    "title": "Serviços de PvP",
+    "description": "Alcance ratings elevados e conquiste títulos exclusivos.",
+    "price": "R$ 149,90",
+    "detailsUrl": "/pvp"
+  },
+  {
+    "imageUrl": "https://via.placeholder.com/600x300?text=Special+Items",
+    "imageAlt": "Special Items",
+    "title": "Itens Especiais",
+    "description": "Obtenha montarias raras, transmogs e itens exclusivos.",
+    "price": "R$ 89,90",
+    "detailsUrl": "/itens"
+  }
+]

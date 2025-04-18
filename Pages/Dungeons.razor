@@ -1,131 +1,38 @@
 @page "/dungeons"
 
-<div class="bg-gradient-to-r from-blue-600 to-indigo-800 py-16">
-  <div class="container mx-auto px-4 text-center">
-    <h1 class="text-5xl font-bold text-white mb-4">Mythic+ Dungeons</h1>
-    <p class="text-xl text-white mb-8 max-w-3xl mx-auto">
-      Domine as masmorras mais desafiadoras com nossa equipe experiente. Garantimos completar suas
-      dungeons com chaves altas rapidamente.
-    </p>
-  </div>
-</div>
+<ServiceTemplate 
+  Title="Mythic+ Dungeons" 
+  Description="Domine as masmorras mais desafiadoras com nossa equipe experiente. Garantimos completar suas dungeons com chaves altas rapidamente."
+  GradientClasses="from-blue-600 to-indigo-800"
+  IconColor="text-blue-500"
+  HoverBorderColor="border-blue-500">
+  <LeftContent>
+    <h2 class="text-3xl font-bold mb-6">O que nosso serviço de Mythic+ oferece?</h2>
+    <ul class="space-y-4">
+      <CheckListItem Text="Runs rápidas com garantia de conclusão no tempo" IconColor="text-blue-500" />
+      <CheckListItem Text="Equipe composta por jogadores Gladiator/Elite com anos de experiência" IconColor="text-blue-500" />
+      <CheckListItem Text="Loot garantido direcionado para seu personagem" IconColor="text-blue-500" />
+      <CheckListItem Text="Streams privadas para você acompanhar a run" IconColor="text-blue-500" />
+    </ul>
 
-<div class="container mx-auto px-4 py-12">
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-    <div>
-      <h2 class="text-3xl font-bold mb-6">O que nosso serviço de Mythic+ oferece?</h2>
-      <ul class="space-y-4">
-        <li class="flex items-start">
-          <svg
-            class="h-6 w-6 text-blue-500 mr-2"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M5 13l4 4L19 7" />
-          </svg>
-          <span>Runs rápidas com garantia de conclusão no tempo</span>
-        </li>
-        <li class="flex items-start">
-          <svg
-            class="h-6 w-6 text-blue-500 mr-2"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M5 13l4 4L19 7" />
-          </svg>
-          <span>Equipe composta por jogadores Gladiator/Elite com anos de experiência</span>
-        </li>
-        <li class="flex items-start">
-          <svg
-            class="h-6 w-6 text-blue-500 mr-2"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M5 13l4 4L19 7" />
-          </svg>
-          <span>Loot garantido direcionado para seu personagem</span>
-        </li>
-        <li class="flex items-start">
-          <svg
-            class="h-6 w-6 text-blue-500 mr-2"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M5 13l4 4L19 7" />
-          </svg>
-          <span>Streams privadas para você acompanhar a run</span>
-        </li>
-      </ul>
-
-      <div class="mt-8">
-        <h3 class="text-2xl font-bold mb-4">Como funciona?</h3>
-        <ol class="list-decimal pl-5 space-y-2">
-          <li>Escolha o nível da chave e a quantidade de runs</li>
-          <li>Selecione as masmorras específicas ou deixe-nos escolher as mais rápidas</li>
-          <li>Informe detalhes do seu personagem e preferências de loot</li>
-          <li>Realize o pagamento</li>
-          <li>Agende com nossa equipe e receba seu boost!</li>
-        </ol>
-      </div>
+    <div class="mt-8">
+      <h3 class="text-2xl font-bold mb-4">Como funciona?</h3>
+      <ol class="list-decimal pl-5 space-y-2">
+        <li>Escolha o nível da chave e a quantidade de runs</li>
+        <li>Selecione as masmorras específicas ou deixe-nos escolher as mais rápidas</li>
+        <li>Informe detalhes do seu personagem e preferências de loot</li>
+        <li>Realize o pagamento</li>
+        <li>Agende com nossa equipe e receba seu boost!</li>
+      </ol>
     </div>
-    <div>
-      <div class="bg-white rounded-lg shadow-lg p-8 border border-gray-200">
-        <h3 class="text-2xl font-bold mb-6 text-center">Escolha seu pacote</h3>
-        <div class="space-y-4">
-          <div
-            class="border border-gray-200 rounded-lg p-4 hover:border-blue-500 cursor-pointer transition">
-            <div class="flex justify-between items-center">
-              <span class="font-bold">Mythic+10 (Única)</span>
-              <span class="text-xl font-bold">R$ 49,90</span>
-            </div>
-          </div>
-          <div
-            class="border border-gray-200 rounded-lg p-4 hover:border-blue-500 cursor-pointer transition bg-blue-50">
-            <div class="flex justify-between items-center">
-              <div>
-                <span class="font-bold">Pacote 4x Mythic+15</span>
-                <span class="bg-green-500 text-white text-xs px-2 py-1 rounded-full ml-2"
-                  >Mais Popular</span
-                >
-              </div>
-              <span class="text-xl font-bold">R$ 189,90</span>
-            </div>
-          </div>
-          <div
-            class="border border-gray-200 rounded-lg p-4 hover:border-blue-500 cursor-pointer transition">
-            <div class="flex justify-between items-center">
-              <span class="font-bold">Mythic+20 (Única)</span>
-              <span class="text-xl font-bold">R$ 99,90</span>
-            </div>
-          </div>
-        </div>
-        <div class="mt-8">
-          <button
-            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 mb-4">
-            Adicionar ao Carrinho
-          </button>
-          <button
-            class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
-            Comprar Agora
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+  </LeftContent>
+  <RightContent>
+    <PricingCard Title="Escolha seu pacote" HoverBorderColor="border-blue-500" OnAddToCart="@(() => Console.WriteLine("Add to cart"))" OnBuyNow="@(() => Console.WriteLine("Buy now"))">
+      <PricingOptions>
+        <PricingOption Title="Mythic+10 (Única)" Price="R$ 49,90" HoverBorderColor="border-blue-500" />
+        <PricingOption Title="Pacote 4x Mythic+15" Price="R$ 189,90" IsPopular="true" HoverBorderColor="border-blue-500" />
+        <PricingOption Title="Mythic+20 (Única)" Price="R$ 99,90" HoverBorderColor="border-blue-500" />
+      </PricingOptions>
+    </PricingCard>
+  </RightContent>
+</ServiceTemplate>

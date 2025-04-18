@@ -41,7 +41,7 @@ npm run watch
 2. Em um novo terminal, compile e execute o projeto C#:
 
 ```bash
-dotnet run
+dotnet watch run
 ```
 
 4. Acesse a aplicação no navegador:
