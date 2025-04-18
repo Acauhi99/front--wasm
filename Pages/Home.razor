@@ -1,21 +1,27 @@
 ﻿@page "/"
 @layout Layout.MainLayout
 
-<div class="bg-gradient-to-b from-purple-900 to-blue-900 text-white py-20">
-  <div class="container mx-auto px-4 text-center">
-    <h1 class="text-6xl font-bold mb-4">WoW Services</h1>
+<div class="relative bg-gradient-to-b from-purple-900 to-blue-900 text-white py-20 overflow-hidden">
+
+  <div class="absolute inset-0 z-0">
+    <img src="images/splash1.png" alt="Fundo WoW" class="w-full h-full object-cover opacity-30" />
+  </div>
+
+  <div class="relative z-10 container mx-auto px-4 text-center">
+    <h1 class="text-6xl font-bold mb-4">World of Warcraft Auction House</h1>
     <p class="text-xl mb-8 max-w-3xl mx-auto">
       Eleve sua experiência em World of Warcraft com nossos serviços premium. Ouro, Dungeons, Raids,
       PvP e muito mais para garantir seu sucesso em Azeroth!
     </p>
     <a
       href="/catalog"
-      class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg text-lg transition duration-300">
+      class="bg-blue-700 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg text-lg transition duration-300">
       Ver Catálogo
     </a>
   </div>
 </div>
 
+<div class="bg-[#11110c] text-white py-16">
 <div class="container mx-auto px-4 py-16">
   <h2 class="text-4xl font-bold text-center mb-12">Serviços em Destaque</h2>
   <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -63,42 +69,47 @@
     </div>
   </div>
 </div>
+</div>
 
-<div class="bg-gray-100 py-16">
+<div class="bg-gradient-to-b from-purple-900 to-blue-900 text-white py-16">
   <div class="container mx-auto px-4">
     <h2 class="text-4xl font-bold text-center mb-12">Avaliações de Clientes</h2>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <div class="bg-white p-6 rounded-lg shadow-md">
+      
+      <div class="bg-[#1c1c18] p-6 rounded-lg shadow-md">
         <div class="flex text-yellow-400 mb-4">
           <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
         </div>
-        <p class="text-gray-600 mb-4">
+        <p class="text-gray-300 mb-4">
           "Serviço excepcional! Consegui todo o ouro que precisava em apenas algumas horas. Super
           recomendo!"
         </p>
-        <p class="font-bold">- Anduin_Wrynn</p>
+        <p class="font-bold text-white">- Anduin_Wrynn</p>
       </div>
-      <div class="bg-white p-6 rounded-lg shadow-md">
+
+      <div class="bg-[#1c1c18] p-6 rounded-lg shadow-md">
         <div class="flex text-yellow-400 mb-4">
           <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
         </div>
-        <p class="text-gray-600 mb-4">
+        <p class="text-gray-300 mb-4">
           "O boost de Mythic+ foi perfeito. A equipe foi muito profissional e consegui todos os
           itens que queria."
         </p>
-        <p class="font-bold">- Sylvanas_Dark</p>
+        <p class="font-bold text-white">- Sylvanas_Dark</p>
       </div>
-      <div class="bg-white p-6 rounded-lg shadow-md">
+
+      <div class="bg-[#1c1c18] p-6 rounded-lg shadow-md">
         <div class="flex text-yellow-400 mb-4">
-          <span>★</span><span>★</span><span>★</span><span>★</span
-          ><span class="text-gray-300">★</span>
+          <span>★</span><span>★</span><span>★</span><span>★</span>
+          <span class="text-gray-500">★</span>
         </div>
-        <p class="text-gray-600 mb-4">
+        <p class="text-gray-300 mb-4">
           "O serviço de raid foi ótimo, completei toda a raid em tempo recorde. Só demorou um pouco
           para começar."
         </p>
-        <p class="font-bold">- Thrall_Durotan</p>
+        <p class="font-bold text-white">- Thrall_Durotan</p>
       </div>
+
     </div>
   </div>
 </div>
