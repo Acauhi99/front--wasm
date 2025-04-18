@@ -1,39 +1,40 @@
-<header class="bg-gray-800 text-white shadow-lg">
-  <div class="container mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center">
-    <div class="flex items-center space-x-4 mb-4 md:mb-0">
+<header class="bg-[#11110c] text-white shadow-lg">
+  <div class="container mx-auto px-4 h-20 flex flex-row justify-between items-center">
+    <div class="flex items-center space-x-4">
       <NavLink href="/" Match="NavLinkMatch.All">
-        <img src="images/wowahlogo.png" alt="WoW Logo" class="h-16 cursor-pointer" />
+        <img src="images/wowahlogo.png" alt="WoW Logo" class="h-16 md:h-18 object-contain" />
       </NavLink>
     </div>
     <nav>
       <ul class="flex flex-wrap justify-center space-x-4 md:space-x-6">
-        <li><a href="/" class="hover:text-blue-400 transition">Home</a></li>
-        <li><a href="/catalog" class="hover:text-blue-400 transition">Catálogo</a></li>
-        <li><a href="/gold" class="hover:text-blue-400 transition">Gold</a></li>
-        <li><a href="/dungeons" class="hover:text-blue-400 transition">Dungeons</a></li>
-        <li><a href="/raids" class="hover:text-blue-400 transition">Raids</a></li>
-        <li><a href="/pvp" class="hover:text-blue-400 transition">PvP</a></li>
-        <li><a href="/itens" class="hover:text-blue-400 transition">Itens</a></li>
+    <li><a href="/" class="hover:text-[#f1c533] transition">Home</a></li>
+        <li><a href="/catalog" class="hover:text-[#f1c533] transition">Catálogo</a></li>
+        <li><a href="/gold" class="hover:text-[#f1c533] transition">Gold</a></li>
+        <li><a href="/dungeons" class="hover:text-[#f1c533] transition">Dungeons</a></li>
+        <li><a href="/raids" class="hover:text-[#f1c533] transition">Raids</a></li>
+        <li><a href="/pvp" class="hover:text-[#f1c533] transition">PvP</a></li>
+        <li><a href="/itens" class="hover:text-[#f1c533] transition">Itens</a></li>
         <li>
-          <a href="/cart" class="hover:text-blue-400 transition relative">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-            <span
-              class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
-              >0</span
-            >
-          </a>
-        </li>
+  <a href="/cart" class="text-[#f1c533] hover:text-white transition relative">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="h-6 w-6"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor">
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+    </svg>
+    <span
+      class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+      >0</span>
+  </a>
+</li>
+
+
       </ul>
     </nav>
   </div>
