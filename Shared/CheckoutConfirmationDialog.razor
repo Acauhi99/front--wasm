@@ -1,3 +1,6 @@
+@inject IJSRuntime JSRuntime
+@implements IDisposable
+
 @code {
     [Parameter]
     public string Title { get; set; } = "Sucesso!";
@@ -18,12 +21,23 @@
     private string backdropClasses => IsVisible 
         ? "opacity-100" 
         : "opacity-0";
+    
+    private System.Threading.Timer? _timer;
 
     protected override void OnParametersSet()
     {
-        if (IsVisible && !isRendered)
+        if (IsVisible)
         {
             isRendered = true;
+        }
+        else if (!IsVisible && isRendered)
+        {
+            DisposeTimer();
+            _timer = new System.Threading.Timer(_ => 
+            {
+                isRendered = false;
+                InvokeAsync(StateHasChanged);
+            }, null, 300, Timeout.Infinite);
         }
     }
 
@@ -31,33 +45,45 @@
     {
         await OnClose.InvokeAsync();
     }
+    
+    private void DisposeTimer()
+    {
+        _timer?.Dispose();
+        _timer = null;
+    }
+    
+    public void Dispose()
+    {
+        DisposeTimer();
+    }
 }
 
 @if (isRendered)
 {
+    <!-- Make sure this div has fixed position and is centered -->
     <div class="fixed inset-0 z-50 flex items-center justify-center" @onclick="HandleClose">
-        <!-- Backdrop with Tailwind transitions -->
-        <div class="absolute inset-0 backdrop-blur-sm bg-gray-700/30 transition-opacity duration-300 ease-out @backdropClasses"></div>
+        <!-- Backdrop with blur effect -->
+        <div class="absolute inset-0 backdrop-blur-md bg-black/50 transition-opacity duration-300 ease-out @backdropClasses"></div>
         
-        <!-- Dialog with Tailwind transitions -->
-        <div class="relative bg-white rounded-lg p-8 w-full max-w-lg shadow-2xl border border-gray-200 z-10
+        <!-- Add fixed height/width to ensure proper centering -->
+        <div class="relative bg-[#2d2d25] text-gray-200 rounded-lg p-8 w-full max-w-lg mx-auto shadow-2xl border border-gray-700 z-10
                    transition-all duration-300 ease-out @dialogClasses"
              @onclick:stopPropagation>
             <div class="flex flex-col items-center text-center">
-                <!-- Green checkmark icon with Tailwind animation -->
-                <div class="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mb-4 animate-pulse">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <!-- Green checkmark icon with improved animation -->
+                <div class="w-24 h-24 rounded-full bg-green-900/30 flex items-center justify-center mb-6 animate-pulse">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-14 w-14 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                     </svg>
                 </div>
                 
-                <h3 class="text-xl font-bold mb-3">@Title</h3>
-                <p class="mb-6 text-gray-700">@Message</p>
+                <h3 class="text-2xl font-bold mb-3">@Title</h3>
+                <p class="mb-8 text-gray-300">@Message</p>
                 
                 <button 
                     @onclick="HandleClose" 
-                    class="px-8 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition cursor-pointer">
-                    OK
+                    class="px-8 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg transition cursor-pointer shadow-lg hover:shadow-green-500/30 focus:outline-none focus:ring-2 focus:ring-green-500">
+                    Continuar
                 </button>
             </div>
         </div>

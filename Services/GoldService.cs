@@ -1,7 +1,6 @@
 using System.Net.Http.Json;
 using front__wasm.Models;
 
-
 namespace front__wasm.Services
 {
   public class GoldService
@@ -15,21 +14,19 @@ namespace front__wasm.Services
       _logger = logger;
     }
 
-    public async Task<IEnumerable<GoldPackage>> GetGoldPackagesAsync()
+    public async Task<GoldServiceDetails?> GetGoldDetailsAsync()
     {
       try
       {
-        var packages = await _httpClient.GetFromJsonAsync<IEnumerable<GoldPackage>>("data/gold.json");
-
-        _logger?.LogInformation($"Loaded {packages?.Count() ?? 0} gold packages");
-
-        return packages ?? new List<GoldPackage>();
+        var details = await _httpClient.GetFromJsonAsync<GoldServiceDetails>("data/gold.json");
+        _logger?.LogInformation("Loaded gold service details successfully.");
+        return details;
       }
       catch (Exception ex)
       {
-        _logger?.LogError(ex, "Erro ao carregar pacotes de ouro: {Message}", ex.Message);
-        Console.WriteLine($"Error loading gold packages: {ex.Message}");
-        return new List<GoldPackage>();
+        _logger?.LogError(ex, "Error loading gold service details: {Message}", ex.Message);
+        Console.WriteLine($"Error loading gold service details: {ex.Message}");
+        return null;
       }
     }
   }
