@@ -41,7 +41,7 @@
               UnitPrice="@item.UnitPrice" 
               Quantity="@item.Quantity" 
               OnQuantityChanged="@(qty => UpdateQuantity(item, qty))" 
-              OnRemoveClicked="@(() => RemoveItem(item))" />
+              OnRemoveClicked="@(() => ShowDeleteConfirmation(item))" />
           }
         }
       </div>
@@ -57,8 +57,26 @@
   </div>
 </div>
 
+<!-- Add checkout confirmation dialog -->
+<CheckoutConfirmationDialog 
+  IsVisible="@showCheckoutConfirmation"
+  Title="Pedido concluído!"
+  Message="Sua compra foi finalizada com sucesso. Obrigado pela preferência!"
+  OnClose="@HandleCheckoutConfirmationClose" />
+
+<!-- Add delete confirmation dialog -->
+<DeleteConfirmationDialog
+  IsVisible="@showDeleteConfirmation"
+  Title="Remover item"
+  Message="@($"Tem certeza que deseja remover '{itemToDelete?.Title}' do carrinho?")"
+  OnConfirm="@ConfirmDeleteItem"
+  OnCancel="@CancelDeleteItem" />
+
 @code {
     private List<CartItemModel> cartItems = new List<CartItemModel>();
+    private bool showCheckoutConfirmation = false;
+    private bool showDeleteConfirmation = false;
+    private CartItemModel? itemToDelete = null;
 
     protected override void OnInitialized()
     {
@@ -97,6 +115,30 @@
         item.Quantity = newQuantity;
     }
 
+    // Novo método para exibir a confirmação de remoção
+    private void ShowDeleteConfirmation(CartItemModel item)
+    {
+        itemToDelete = item;
+        showDeleteConfirmation = true;
+    }
+
+    // Método para confirmar a remoção
+    private void ConfirmDeleteItem()
+    {
+        if (itemToDelete != null)
+        {
+            RemoveItem(itemToDelete);
+        }
+        showDeleteConfirmation = false;
+    }
+
+    // Método para cancelar a remoção
+    private void CancelDeleteItem()
+    {
+        showDeleteConfirmation = false;
+        itemToDelete = null;
+    }
+
     private void RemoveItem(CartItemModel item)
     {
         cartItems.Remove(item);
@@ -124,8 +166,20 @@
 
     private void HandleCheckout()
     {
-        // Implement checkout functionality here
-        Console.WriteLine("Checkout clicked");
+        // Show checkout confirmation dialog
+        showCheckoutConfirmation = true;
+    }
+
+    private void HandleCheckoutConfirmationClose()
+    {
+        // Close dialog
+        showCheckoutConfirmation = false;
+        
+        // Clear the cart
+        cartItems.Clear();
+        
+        // Force UI refresh
+        StateHasChanged();
     }
 
     public class CartItemModel

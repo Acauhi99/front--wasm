@@ -1,3 +1,5 @@
+@implements IDisposable
+
 @code {
     [Parameter]
     public string Title { get; set; } = "Confirmação";
@@ -14,6 +16,35 @@
     [Parameter]
     public bool IsVisible { get; set; }
 
+    private bool isRendered = false;
+    private string dialogClasses => IsVisible 
+        ? "transform scale-100 opacity-100" 
+        : "transform scale-95 opacity-0";
+    private string backdropClasses => IsVisible 
+        ? "opacity-100" 
+        : "opacity-0";
+    
+    // Timer para remover o diálogo do DOM após a animação terminar
+    private System.Threading.Timer? _timer;
+
+    protected override void OnParametersSet()
+    {
+        if (IsVisible)
+        {
+            isRendered = true;
+        }
+        else if (!IsVisible && isRendered)
+        {
+            // Programa a remoção do diálogo após a animação terminar
+            DisposeTimer();
+            _timer = new System.Threading.Timer(_ => 
+            {
+                isRendered = false;
+                InvokeAsync(StateHasChanged);
+            }, null, 300, Timeout.Infinite);
+        }
+    }
+
     private async Task HandleConfirm()
     {
         await OnConfirm.InvokeAsync();
@@ -23,14 +54,25 @@
     {
         await OnCancel.InvokeAsync();
     }
+    
+    private void DisposeTimer()
+    {
+        _timer?.Dispose();
+        _timer = null;
+    }
+    
+    public void Dispose()
+    {
+        DisposeTimer();
+    }
 }
 
-@if (IsVisible)
+@if (isRendered)
 {
     <div class="fixed inset-0 z-50 flex items-center justify-center" @onclick="HandleCancel">
-        <div class="absolute inset-0 backdrop-blur-sm bg-black/50 transition-opacity duration-300"></div>
+        <div class="absolute inset-0 backdrop-blur-sm bg-black/50 transition-opacity duration-300 @backdropClasses"></div>
         
-        <div class="relative bg-[#2d2d25] text-gray-200 rounded-lg p-8 w-full max-w-lg shadow-2xl border border-gray-700 z-10 transform transition-all duration-300 ease-out"
+        <div class="relative bg-[#2d2d25] text-gray-200 rounded-lg p-8 w-full max-w-lg mx-auto shadow-2xl border border-gray-700 z-10 transition-all duration-300 ease-out @dialogClasses"
              @onclick:stopPropagation>
             <div class="absolute top-4 right-4">
                 <button @onclick="HandleCancel" class="text-gray-400 hover:text-gray-200 transition-colors">

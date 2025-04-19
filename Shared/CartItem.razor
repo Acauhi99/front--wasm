@@ -23,8 +23,6 @@
     [Parameter]
     public EventCallback OnRemoveClicked { get; set; }
 
-    private bool showDeleteConfirmation = false;
-
     private async Task DecreaseQuantity()
     {
         if (Quantity > 1)
@@ -33,25 +31,14 @@
         }
         else
         {
-            // Se a quantidade é 1, mostra o diálogo de confirmação
-            showDeleteConfirmation = true;
+            // Chama diretamente o evento de remoção
+            await OnRemoveClicked.InvokeAsync();
         }
     }
 
     private async Task IncreaseQuantity()
     {
         await OnQuantityChanged.InvokeAsync(Quantity + 1);
-    }
-
-    private async Task ConfirmDelete()
-    {
-        showDeleteConfirmation = false;
-        await OnRemoveClicked.InvokeAsync();
-    }
-
-    private void CancelDelete()
-    {
-        showDeleteConfirmation = false;
     }
 
     private decimal CalculateTotal()
@@ -112,7 +99,7 @@
   </div>
   
   <div class="w-full md:w-1/12 text-center">
-    <button @onclick="@(() => showDeleteConfirmation = true)" class="text-red-500 hover:text-red-400 hover:bg-[#3b3b30] p-2 rounded-full transition-all duration-300 cursor-pointer">
+    <button @onclick="OnRemoveClicked" class="text-red-500 hover:text-red-400 hover:bg-[#3b3b30] p-2 rounded-full transition-all duration-300 cursor-pointer">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         class="h-5 w-5"
@@ -127,11 +114,4 @@
       </svg>
     </button>
   </div>
-  
-  <DeleteConfirmationDialog 
-    IsVisible="@showDeleteConfirmation"
-    Title="Remover item"
-    Message="@($"Tem certeza que deseja remover '{Title}' do carrinho?")"
-    OnConfirm="@ConfirmDelete"
-    OnCancel="@CancelDelete" />
 </div>

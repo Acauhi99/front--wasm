@@ -1,3 +1,6 @@
+@inject IJSRuntime JSRuntime
+@implements IDisposable
+
 @code {
     [Parameter]
     public string Title { get; set; } = "Sucesso!";
@@ -18,12 +21,25 @@
     private string backdropClasses => IsVisible 
         ? "opacity-100" 
         : "opacity-0";
+    
+    // Timer para remover o diálogo do DOM após a animação terminar
+    private System.Threading.Timer? _timer;
 
     protected override void OnParametersSet()
     {
-        if (IsVisible && !isRendered)
+        if (IsVisible)
         {
             isRendered = true;
+        }
+        else if (!IsVisible && isRendered)
+        {
+            // Programa a remoção do diálogo após a animação terminar
+            DisposeTimer();
+            _timer = new System.Threading.Timer(_ => 
+            {
+                isRendered = false;
+                InvokeAsync(StateHasChanged);
+            }, null, 300, Timeout.Infinite);
         }
     }
 
@@ -31,16 +47,28 @@
     {
         await OnClose.InvokeAsync();
     }
+    
+    private void DisposeTimer()
+    {
+        _timer?.Dispose();
+        _timer = null;
+    }
+    
+    public void Dispose()
+    {
+        DisposeTimer();
+    }
 }
 
 @if (isRendered)
 {
+    <!-- Make sure this div has fixed position and is centered -->
     <div class="fixed inset-0 z-50 flex items-center justify-center" @onclick="HandleClose">
-        <!-- Backdrop com efeito de blur aprimorado -->
+        <!-- Backdrop with blur effect -->
         <div class="absolute inset-0 backdrop-blur-md bg-black/50 transition-opacity duration-300 ease-out @backdropClasses"></div>
         
-        <!-- Dialog com animação aprimorada -->
-        <div class="relative bg-[#2d2d25] text-gray-200 rounded-lg p-8 w-full max-w-lg shadow-2xl border border-gray-700 z-10
+        <!-- Add fixed height/width to ensure proper centering -->
+        <div class="relative bg-[#2d2d25] text-gray-200 rounded-lg p-8 w-full max-w-lg mx-auto shadow-2xl border border-gray-700 z-10
                    transition-all duration-300 ease-out @dialogClasses"
              @onclick:stopPropagation>
             <div class="flex flex-col items-center text-center">

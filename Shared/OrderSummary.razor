@@ -9,16 +9,11 @@
     public EventCallback OnCheckoutClicked { get; set; }
 
     private decimal Total => Subtotal + ServiceFee;
-    private bool showCheckoutConfirmation = false;
 
-    private void HandleCheckoutClick()
+    private async Task HandleCheckoutClick()
     {
-        showCheckoutConfirmation = true;
-    }
-
-    private async Task HandleCheckoutConfirmed()
-    {
-        showCheckoutConfirmation = false;
+        // Chame diretamente o callback do componente pai (Cart)
+        // sem mostrar um diálogo próprio
         await OnCheckoutClicked.InvokeAsync();
     }
 }
@@ -41,7 +36,7 @@
         <span class="text-blue-400">R$ @(Total.ToString("F2").Replace(".", ","))</span>
     </div>
     
-    <button @onclick="HandleCheckoutClick" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 cursor-pointer focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 focus:outline-none shadow-lg hover:shadow-blue-500/30 flex justify-center items-center">
+    <button @onclick="HandleCheckoutClick" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 cursor-pointer focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-lg hover:shadow-blue-500/30 flex justify-center items-center">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
         </svg>
@@ -54,10 +49,6 @@
         </svg>
         Pagamento seguro
     </div>
-
-    <CheckoutConfirmationDialog 
-        IsVisible="@showCheckoutConfirmation"
-        Title="Compra Finalizada"
-        Message="Sua compra foi realizada com sucesso! Obrigado por escolher nossos serviços."
-        OnClose="HandleCheckoutConfirmed" />
+    
+    <!-- Removi o CheckoutConfirmationDialog daqui -->
 </div>
