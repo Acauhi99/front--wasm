@@ -1,5 +1,8 @@
 @page "/gold"
 @using front__wasm.Shared
+@using front__wasm.Models
+@using front__wasm.Services
+@inject GoldService GoldService
 
 <ServiceTemplate 
   Title="Serviços de Gold" 
@@ -9,44 +12,20 @@
     <h2 class="text-3xl font-bold mb-6">Por que escolher nosso serviço de Gold?</h2>
     <ul class="space-y-4">
       <li class="flex items-start">
-        <svg
-          class="h-6 w-6 text-yellow-500 mr-2"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M5 13l4 4L19 7" />
+        <svg class="h-6 w-6 text-yellow-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
         </svg>
         <span>Entrega garantida em até 24 horas</span>
       </li>
       <li class="flex items-start">
-        <svg
-          class="h-6 w-6 text-yellow-500 mr-2"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M5 13l4 4L19 7" />
+        <svg class="h-6 w-6 text-yellow-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
         </svg>
         <span>Métodos 100% seguros, sem risco para sua conta</span>
       </li>
       <li class="flex items-start">
-        <svg
-          class="h-6 w-6 text-yellow-500 mr-2"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M5 13l4 4L19 7" />
+        <svg class="h-6 w-6 text-yellow-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
         </svg>
         <span>Disponível para todos os servidores</span>
       </li>
@@ -79,25 +58,33 @@
                         GoldAmount="@package.GoldAmount" 
                         Price="@package.Price" 
                         IsPopular="@package.IsPopular" 
-                        OnAddToCart="() => AddToCart(package)" />
+                        IsSelected="@(selectedPackageId == package.Id)" 
+                        PackageId="@package.Id"
+                        OnPackageSelected="HandlePackageSelected" />
                 }
             }
         </div>
+        <button class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition"
+                disabled="@(!goldPackages?.Any() ?? true)">
+            Adicionar ao Carrinho
+        </button>
     </div>
   </RightContent>
 </ServiceTemplate>
 
 @code {
     private IEnumerable<GoldPackage>? goldPackages;
+    private int? selectedPackageId; 
 
     protected override async Task OnInitializedAsync()
     {
-        goldPackages = await CatalogService.GetGoldPackagesAsync();
+        goldPackages = await GoldService.GetGoldPackagesAsync();
+        Console.WriteLine($"Loaded {goldPackages?.Count() ?? 0} packages.");
     }
 
-    private void AddToCart(GoldPackage package)
+    private void HandlePackageSelected(int packageId)
     {
-        Console.WriteLine($"Added to cart: {package.GoldAmount} Gold for R$ {package.Price}");
-        // Add logic to update the cart
+        selectedPackageId = packageId; 
+        Console.WriteLine($"Selected package ID: {packageId}");
     }
 }

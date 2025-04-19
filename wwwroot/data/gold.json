@@ -1,19 +1,20 @@
-{
-  "goldPackages": [
-    {
-      "goldAmount": 10000,
-      "price": 19.90,
-      "isPopular": false
-    },
-    {
-      "goldAmount": 100000,
-      "price": 149.90,
-      "isPopular": true
-    },
-    {
-      "goldAmount": 500000,
-      "price": 599.90,
-      "isPopular": false
-    }
-  ]
-}
+[
+  {
+    "id": 1,
+    "goldAmount": 10000,
+    "price": 19.99,
+    "isPopular": false
+  },
+  {
+    "id": 2,
+    "goldAmount": 100000,
+    "price": 149.99,
+    "isPopular": true
+  },
+  {
+    "id": 3,
+    "goldAmount": 500000,
+    "price": 599.99,
+    "isPopular": false
+  }
+]
