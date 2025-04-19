@@ -22,7 +22,6 @@
         ? "opacity-100" 
         : "opacity-0";
     
-    // Timer para remover o diálogo do DOM após a animação terminar
     private System.Threading.Timer? _timer;
 
     protected override void OnParametersSet()
@@ -33,7 +32,6 @@
         }
         else if (!IsVisible && isRendered)
         {
-            // Programa a remoção do diálogo após a animação terminar
             DisposeTimer();
             _timer = new System.Threading.Timer(_ => 
             {

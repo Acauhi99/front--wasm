@@ -1,3 +1,7 @@
+@using front__wasm.Services
+@inject CartService CartService
+@implements IDisposable
+
 <header class="bg-[#11110c] text-white shadow-lg">
   <div class="container mx-auto px-4 h-20 flex flex-row justify-between items-center">
     <div class="flex items-center space-x-4">
@@ -30,7 +34,7 @@
     </svg>
     <span
       class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
-      >0</span>
+      >@CartService.Count</span>
   </a>
 </li>
 
@@ -39,3 +43,15 @@
     </nav>
   </div>
 </header>
+
+@code {
+    protected override void OnInitialized()
+    {
+        CartService.OnChange += StateHasChanged;
+    }
+    
+    public void Dispose()
+    {
+        CartService.OnChange -= StateHasChanged;
+    }
+}
