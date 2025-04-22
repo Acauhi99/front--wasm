@@ -1,0 +1,104 @@
+@inject IJSRuntime JSRuntime
+@implements IDisposable
+
+@code {
+    [Parameter]
+    public string Title { get; set; } = "Item Adicionado!";
+
+    [Parameter]
+    public string Message { get; set; } = "O item foi adicionado ao seu carrinho com sucesso!";
+
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+    
+    [Parameter]
+    public EventCallback OnViewCart { get; set; }
+
+    [Parameter]
+    public bool IsVisible { get; set; }
+
+    private bool isRendered = false;
+    private string dialogClasses => IsVisible 
+        ? "transform scale-100 opacity-100" 
+        : "transform scale-95 opacity-0";
+    private string backdropClasses => IsVisible 
+        ? "opacity-100" 
+        : "opacity-0";
+    
+    private System.Threading.Timer? _timer;
+
+    protected override void OnParametersSet()
+    {
+        if (IsVisible)
+        {
+            isRendered = true;
+        }
+        else if (!IsVisible && isRendered)
+        {
+            DisposeTimer();
+            _timer = new System.Threading.Timer(_ => 
+            {
+                isRendered = false;
+                InvokeAsync(StateHasChanged);
+            }, null, 300, Timeout.Infinite);
+        }
+    }
+
+    private async Task HandleClose()
+    {
+        await OnClose.InvokeAsync();
+    }
+    
+    private async Task HandleViewCart()
+    {
+        await OnViewCart.InvokeAsync();
+    }
+    
+    private void DisposeTimer()
+    {
+        _timer?.Dispose();
+        _timer = null;
+    }
+    
+    public void Dispose()
+    {
+        DisposeTimer();
+    }
+}
+
+@if (isRendered)
+{
+    <div class="fixed inset-0 z-50 flex items-center justify-center" @onclick="HandleClose">
+        <!-- Backdrop with blur effect -->
+        <div class="absolute inset-0 backdrop-blur-md bg-black/50 transition-opacity duration-300 ease-out @backdropClasses"></div>
+        
+        <div class="relative bg-[#2d2d25] text-gray-200 rounded-lg p-8 w-full max-w-lg mx-auto shadow-2xl border border-gray-700 z-10
+                  transition-all duration-300 ease-out @dialogClasses"
+             @onclick:stopPropagation>
+            <div class="flex flex-col items-center text-center">
+                <!-- Blue cart icon with animation -->
+                <div class="w-24 h-24 rounded-full bg-blue-900/30 flex items-center justify-center mb-6 animate-pulse">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-14 w-14 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                </div>
+                
+                <h3 class="text-2xl font-bold mb-3">@Title</h3>
+                <p class="mb-8 text-gray-300">@Message</p>
+                
+                <div class="flex flex-col sm:flex-row gap-4 w-full">
+                    <button 
+                        @onclick="HandleViewCart" 
+                        class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition cursor-pointer shadow-lg hover:shadow-blue-500/30 focus:outline-none focus:ring-2 focus:ring-blue-500 flex-1">
+                        Ver Carrinho
+                    </button>
+                    <button 
+                        @onclick="HandleClose" 
+                        class="px-8 py-3 bg-gray-700 hover:bg-gray-800 text-white rounded-lg transition cursor-pointer shadow-lg focus:outline-none focus:ring-2 focus:ring-gray-500 flex-1">
+                        Continuar Comprando
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

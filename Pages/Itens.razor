@@ -1,9 +1,10 @@
 @page "/itens"
-@using front__wasm.Models // Change this line
+@using front__wasm.Models
 @using front__wasm.Services
 @inject ItemService ItemService
 @inject CartService CartService
 @inject NavigationManager NavigationManager
+@inject CatalogService CatalogService
 @using front__wasm.Shared
 
 @if (details == null)
@@ -74,21 +75,30 @@ else
         </div>
       </PackageSelector>
       <ActionButtons>
-        <button
-          @onclick="AddToCart"
-          disabled="@(selectedPackage == null)"
-          class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 mb-4 disabled:opacity-50 disabled:cursor-not-allowed">
-          Adicionar ao Carrinho
-        </button>
-        <button
-          @onclick="BuyNow"
-          disabled="@(selectedPackage == null)"
-          class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
-          Comprar Agora
-        </button>
+        <div class="flex flex-col items-center gap-4">
+          <button
+            @onclick="AddToCart"
+            disabled="@(selectedPackage == null)"
+            class="w-3/4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
+            Adicionar ao Carrinho
+          </button>
+          <button
+            @onclick="BuyNow"
+            disabled="@(selectedPackage == null)"
+            class="w-3/4 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
+            Comprar Agora
+          </button>
+        </div>
       </ActionButtons>
     </ServiceTemplate>
 }
+
+<CartAddDialog 
+    IsVisible="@showCartDialog" 
+    Title="Item Adicionado ao Carrinho" 
+    Message="@cartDialogMessage" 
+    OnClose="CloseCartDialog" 
+    OnViewCart="GoToCart" />
 
 @code {
     private ItemServiceDetails? details;
@@ -96,16 +106,22 @@ else
     private string gradientClasses = "from-green-700 to-teal-600";
     private string iconColor = "text-green-600";
     private string hoverBorderColor = "border-green-500";
+    private bool showCartDialog = false;
+    private string cartDialogMessage = "";
+    private CatalogServiceDetails? catalogService;
 
     protected override async Task OnInitializedAsync()
     {
         details = await ItemService.GetItemDetailsAsync();
+        
+        var services = await CatalogService.GetServicesAsync();
+        catalogService = services.FirstOrDefault(s => s.Title == "Itens Especiais");
     }
 
     private void SelectPackage(Package package)
     {
         selectedPackage = package;
-        StateHasChanged(); // Keep this line
+        StateHasChanged();
     }
 
     private void AddToCart()
@@ -114,7 +130,7 @@ else
 
         var cartItem = new CartItemModel
         {
-            ImageUrl = "https://via.placeholder.com/80?text=Item", 
+            ImageUrl = catalogService?.ImageUrl,
             ImageAlt = $"{details.Title} - {selectedPackage.Name}",
             Title = $"{details.Title} - {selectedPackage.Name}",
             Description = selectedPackage.Name, 
@@ -122,15 +138,28 @@ else
             Quantity = 1
         };
         CartService.AddItem(cartItem);
-        Console.WriteLine($"{cartItem.Title} added to cart.");
+        
+        cartDialogMessage = $"{selectedPackage.Name} foi adicionado ao seu carrinho!";
+        showCartDialog = true;
+        StateHasChanged();
+    }
+
+    private void CloseCartDialog()
+    {
+        showCartDialog = false;
+    }
+
+    private void GoToCart()
+    {
+        NavigationManager.NavigateTo("/cart");
     }
 
     private void BuyNow()
     {
-        AddToCart(); 
+        AddToCart();
         if (selectedPackage != null)
         {
-             NavigationManager.NavigateTo("/cart");
+            NavigationManager.NavigateTo("/cart");
         }
     }
 }

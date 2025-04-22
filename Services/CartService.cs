@@ -44,41 +44,11 @@ namespace front__wasm.Services
                 }
                 catch
                 {
-                    AddDefaultItems();
+                    // No action needed when storage access fails
                 }
-            }
-            else
-            {
-                AddDefaultItems();
             }
 
             _initialized = true;
-        }
-
-        private void AddDefaultItems()
-        {
-            if (!_cartItems.Any())
-            {
-                _cartItems.Add(new CartItemModel
-                {
-                    ImageUrl = "https://via.placeholder.com/80?text=Gold",
-                    ImageAlt = "Gold Service",
-                    Title = "Gold Service",
-                    Description = "10.000 Gold",
-                    UnitPrice = "R$ 19,90",
-                    Quantity = 1
-                });
-
-                _cartItems.Add(new CartItemModel
-                {
-                    ImageUrl = "https://via.placeholder.com/80?text=Gold",
-                    ImageAlt = "Gold Service",
-                    Title = "Gold Service Premium",
-                    Description = "50.000 Gold",
-                    UnitPrice = "R$ 79,90",
-                    Quantity = 1
-                });
-            }
         }
 
         public void AddItem(CartItemModel item)

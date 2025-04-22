@@ -5,6 +5,7 @@
 @inject CartService CartService
 @inject NavigationManager NavigationManager
 @using front__wasm.Shared
+@inject CatalogService CatalogService
 
 @if (details == null)
 {
@@ -53,7 +54,7 @@ else
             string packageClasses;
             if (selectedPackage == package)
             {
-                packageClasses = $"rounded-lg p-4 cursor-pointer transition {selectedBorderClass} {selectedBgClass}";
+                packageClasses = $"rounded-lg p-4 cursor-pointer transition {selectedBorderClass} {defaultBgClass}";
             }
             else
             {
@@ -61,6 +62,7 @@ else
             }
 
             <div
+              @key="package.Name"
               @onclick="() => SelectPackage(package)"
               class="@packageClasses">
               <div class="flex justify-between items-center">
@@ -88,6 +90,12 @@ else
         </button>
       </ActionButtons>
     </ServiceTemplate>
+    <CartAddDialog 
+        IsVisible="@showCartDialog" 
+        Title="Item Adicionado ao Carrinho" 
+        Message="@cartDialogMessage" 
+        OnClose="CloseCartDialog" 
+        OnViewCart="GoToCart" />
 }
 
 @code {
@@ -96,12 +104,17 @@ else
     private string gradientClasses = "from-blue-600 to-indigo-800";
     private string iconColor = "text-blue-500";
     private string hoverBorderColor = "border-indigo-500";
+    private bool showCartDialog = false;
+    private string cartDialogMessage = "";
+    private CatalogServiceDetails? catalogService;
 
     protected override async Task OnInitializedAsync()
     {
         details = await DungeonService.GetDungeonDetailsAsync();
-        // Optionally select the first package by default
-        // selectedPackage = details?.Packages.FirstOrDefault(); 
+        
+        // Get catalog services to find the matching image
+        var services = await CatalogService.GetServicesAsync();
+        catalogService = services.FirstOrDefault(s => s.Title == "Mythic+ Dungeons");
     }
 
     private void SelectPackage(Package package)
@@ -116,8 +129,8 @@ else
 
         var cartItem = new CartItemModel
         {
-            // Consider adding specific images per service/package later
-            ImageUrl = "https://via.placeholder.com/80?text=Dungeon", 
+            // Use the proper image from catalog if available
+            ImageUrl = catalogService?.ImageUrl ?? "https://via.placeholder.com/80?text=Dungeon",
             ImageAlt = $"{details.Title} - {selectedPackage.Name}",
             Title = $"{details.Title} - {selectedPackage.Name}",
             Description = selectedPackage.Name, // Or more details if available
@@ -125,8 +138,11 @@ else
             Quantity = 1
         };
         CartService.AddItem(cartItem);
-        // Optional: Add user feedback like a toast notification
-        Console.WriteLine($"{cartItem.Title} added to cart.");
+        
+        // Show the dialog
+        cartDialogMessage = $"{selectedPackage.Name} foi adicionado ao seu carrinho!";
+        showCartDialog = true;
+        StateHasChanged();
     }
 
     private void BuyNow()
@@ -136,5 +152,15 @@ else
         {
              NavigationManager.NavigateTo("/cart");
         }
+    }
+
+    private void CloseCartDialog()
+    {
+        showCartDialog = false;
+    }
+    
+    private void GoToCart()
+    {
+        NavigationManager.NavigateTo("/cart");
     }
 }

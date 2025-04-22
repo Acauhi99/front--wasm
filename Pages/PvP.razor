@@ -5,6 +5,7 @@
 @inject CartService CartService
 @inject NavigationManager NavigationManager
 @using front__wasm.Shared
+@inject CatalogService CatalogService
 
 @if (details == null)
 {
@@ -90,6 +91,13 @@ else
     </ServiceTemplate>
 }
 
+<CartAddDialog 
+    IsVisible="@showCartDialog" 
+    Title="Item Adicionado ao Carrinho" 
+    Message="@cartDialogMessage" 
+    OnClose="CloseCartDialog" 
+    OnViewCart="GoToCart" />
+
 @code {
     private PvpServiceDetails? details;
     private Package? selectedPackage;
@@ -98,17 +106,23 @@ else
     private string iconColor = "text-red-600";
     private string hoverBorderColor = "border-red-500";
 
+    private bool showCartDialog = false;
+    private string cartDialogMessage = "";
+
+    private CatalogServiceDetails? catalogService;
+
     protected override async Task OnInitializedAsync()
     {
         details = await PvpService.GetPvpDetailsAsync();
-        // Optionally select the first package by default
-        // selectedPackage = details?.Packages.FirstOrDefault();
+        
+        var services = await CatalogService.GetServicesAsync();
+        catalogService = services.FirstOrDefault(s => s.Title == "Serviços de PvP");
     }
 
     private void SelectPackage(Package package)
     {
         selectedPackage = package;
-        StateHasChanged(); // Keep this line
+        StateHasChanged();
     }
 
     private void AddToCart()
@@ -117,7 +131,7 @@ else
 
         var cartItem = new CartItemModel
         {
-            ImageUrl = "https://via.placeholder.com/80?text=PvP", 
+            ImageUrl = catalogService?.ImageUrl,
             ImageAlt = $"{details.Title} - {selectedPackage.Name}",
             Title = $"{details.Title} - {selectedPackage.Name}",
             Description = selectedPackage.Name, 
@@ -125,7 +139,10 @@ else
             Quantity = 1
         };
         CartService.AddItem(cartItem);
-        Console.WriteLine($"{cartItem.Title} added to cart.");
+        
+        cartDialogMessage = $"{selectedPackage.Name} foi adicionado ao seu carrinho!";
+        showCartDialog = true;
+        StateHasChanged();
     }
 
     private void BuyNow()
@@ -135,5 +152,15 @@ else
         {
              NavigationManager.NavigateTo("/cart");
         }
+    }
+
+    private void CloseCartDialog()
+    {
+        showCartDialog = false;
+    }
+    
+    private void GoToCart()
+    {
+        NavigationManager.NavigateTo("/cart");
     }
 }

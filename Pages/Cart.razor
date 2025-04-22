@@ -77,31 +77,6 @@
     private bool showDeleteConfirmation = false;
     private CartItemModel? itemToDelete = null;
 
-    protected override void OnInitialized()
-    {
-        if (!CartService.CartItems.Any())
-        {
-            CartService.AddItem(new CartItemModel 
-            { 
-                ImageUrl = "https://via.placeholder.com/80?text=Gold", 
-                ImageAlt = "Gold Service", 
-                Title = "Gold Service", 
-                Description = "10.000 Gold", 
-                UnitPrice = "R$ 19,90", 
-                Quantity = 1 
-            });
-            CartService.AddItem(new CartItemModel 
-            { 
-                ImageUrl = "https://via.placeholder.com/80?text=Gold", 
-                ImageAlt = "Gold Service", 
-                Title = "Gold Service Premium", 
-                Description = "50.000 Gold", 
-                UnitPrice = "R$ 79,90", 
-                Quantity = 1 
-            });
-        }
-    }
-
     private void UpdateQuantity(CartItemModel item, int newQuantity)
     {
         CartService.UpdateQuantity(item, newQuantity);

@@ -6,6 +6,7 @@
 @inject GoldService GoldService
 @inject CartService CartService
 @inject NavigationManager NavigationManager
+@inject CatalogService CatalogService
 
 @if (details == null)
 {
@@ -92,17 +93,31 @@ else
     </ServiceTemplate>
 }
 
+<CartAddDialog 
+    IsVisible="@showCartDialog" 
+    Title="Item Adicionado ao Carrinho" 
+    Message="@cartDialogMessage" 
+    OnClose="CloseCartDialog" 
+    OnViewCart="GoToCart" />
+
 @code {
     private GoldServiceDetails? details;
     private Package? selectedPackage;
+    private CatalogServiceDetails? catalogService;
 
     private string gradientClasses = "from-yellow-400 to-yellow-600";
     private string iconColor = "text-yellow-500";
     private string hoverBorderColor = "border-yellow-500";
 
+    private bool showCartDialog = false;
+    private string cartDialogMessage = "";
+
     protected override async Task OnInitializedAsync()
     {
         details = await GoldService.GetGoldDetailsAsync();
+        
+        var services = await CatalogService.GetServicesAsync();
+        catalogService = services.FirstOrDefault(s => s.Title == "Gold Services");
     }
 
     private void SelectPackage(Package package)
@@ -117,7 +132,7 @@ else
 
         var cartItem = new CartItemModel
         {
-            ImageUrl = "https://via.placeholder.com/80?text=Gold", 
+            ImageUrl = catalogService?.ImageUrl, 
             ImageAlt = $"{details.Title} - {selectedPackage.Name}",
             Title = $"{details.Title} - {selectedPackage.Name}",
             Description = selectedPackage.Name, 
@@ -125,7 +140,20 @@ else
             Quantity = 1
         };
         CartService.AddItem(cartItem);
-        Console.WriteLine($"{cartItem.Title} added to cart.");
+        
+        cartDialogMessage = $"{selectedPackage.Name} foi adicionado ao seu carrinho!";
+        showCartDialog = true;
+        StateHasChanged();
+    }
+
+    private void CloseCartDialog()
+    {
+        showCartDialog = false;
+    }
+
+    private void GoToCart()
+    {
+        NavigationManager.NavigateTo("/cart");
     }
 
     private void BuyNow()
