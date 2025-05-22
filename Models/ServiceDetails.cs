@@ -1,6 +1,6 @@
 namespace front__wasm.Models
 {
-  public class DungeonServiceDetails
+  public class ServiceDetails
   {
     public string Title { get; set; } = "";
     public string Description { get; set; } = "";

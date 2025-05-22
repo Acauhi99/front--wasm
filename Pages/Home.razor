@@ -3,9 +3,9 @@
 @using front__wasm.Models
 @using front__wasm.Services
 @inject CatalogService CatalogService
+@inject DetailsService DetailsService
 
 <div class="relative bg-gradient-to-b from-yellow-900 to-purple-900 text-white py-30 overflow-hidden">
-
   <div class="absolute inset-0 z-0">
     <img src="images/splash1.png" alt="Fundo WoW" class="w-full h-full object-cover opacity-30" />
   </div>
@@ -28,33 +28,51 @@
 <div class="container mx-auto px-4 py-7">
   <h2 class="text-4xl font-bold text-center mb-12">Serviços em Destaque</h2>
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-  @if (services == null)
+  @if (featuredServices == null)
   {
     <p class="text-center col-span-3">Carregando serviços...</p>
   }
-  else if (!services.Any())
+  else if (!featuredServices.Any())
   {
     <p class="text-center col-span-3">Nenhum serviço disponível no momento.</p>
   }
   else
   {
-    @foreach (var service in services
-    .Where(s => s.Title == "Gold Services" || s.Title == "Mythic+ Dungeons" || s.Title == "Raid Boosting"))
+    @foreach (var service in featuredServices)
     {
-      var glowColor = service.Title switch
+        var glowColor = service.Key switch
         {
-          "Gold Services" => "#f1c533",        
-          "Mythic+ Dungeons" => "red",    
-          "Raid Boosting" => "purple",
-          _ => "#808080"                     
+            "gold" => "#f1c533",        
+            "dungeons" => "red",    
+            "raids" => "purple",
+            _ => "#808080"                     
         };
-      <ServiceDestaque 
-        ImageUrl="@service.ImageUrl"
-        ImageAlt="@service.ImageAlt"
-        Title="@service.Title"
-        Description="@service.Description" 
-        DetailsUrl="@service.DetailsUrl"
-        GlowColor="@glowColor"/>
+        
+        var detailsUrl = service.Key switch
+        {
+            "gold" => "/gold",
+            "dungeons" => "/dungeons",
+            "raids" => "/raids",
+            _ => "/"
+        };
+        
+        var imageUrl = service.Key switch
+        {
+            "gold" => "images/gold-services.png",
+            "dungeons" => "images/mythic-plus.png",
+            "raids" => "images/raid-boosting.png",
+            "pvp" => "images/pvp-services.png",
+            "itens" => "images/special-itens.png",
+            _ => ""
+        };
+        
+        <ServiceDestaque 
+            ImageUrl="@imageUrl"
+            ImageAlt="@service.Value.Title"
+            Title="@service.Value.Title"
+            Description="@service.Value.Description" 
+            DetailsUrl="@detailsUrl"
+            GlowColor="@glowColor"/>
     }
   }
 </div>
@@ -105,11 +123,22 @@
 </div>
 
 @code {
-  private IEnumerable<CatalogServiceDetails> services = new List<CatalogServiceDetails>();
+  private Dictionary<string, ServiceDetails> featuredServices = new();
+  private IEnumerable<CatalogServiceDetails> catalogServices = new List<CatalogServiceDetails>();
+  private readonly string[] featuredServiceTypes = new[] { "gold", "dungeons", "raids" };
 
   protected override async Task OnInitializedAsync()
   {
-    services = await CatalogService.GetServicesAsync();
+    catalogServices = await CatalogService.GetServicesAsync();
+    
+    foreach (var serviceType in featuredServiceTypes)
+    {
+      var details = await DetailsService.GetServiceDetailsAsync(serviceType);
+      if (details != null)
+      {
+        featuredServices[serviceType] = details;
+      }
+    }
   }
 }
 

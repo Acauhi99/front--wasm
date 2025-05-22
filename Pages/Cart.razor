@@ -22,11 +22,14 @@
         @if (CartService.CartItems == null || !CartService.CartItems.Any())
         {
           <div class="text-center py-12 md:py-16 px-4">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400 mb-4" fill="none"
+              viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
             <p class="text-xl text-gray-300 font-medium">Seu carrinho está vazio.</p>
-            <a href="/catalog" class="mt-4 inline-block px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition duration-300">
+            <a href="/catalog"
+              class="mt-4 inline-block px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition duration-300">
               Continuar comprando
             </a>
           </div>
@@ -36,14 +39,9 @@
           <div class="space-y-2">
             @foreach (var item in CartService.CartItems)
             {
-              <CartItem 
-                ImageUrl="@item.ImageUrl" 
-                ImageAlt="@item.ImageAlt" 
-                Title="@item.Title" 
-                Description="@item.Description" 
-                UnitPrice="@item.UnitPrice" 
-                Quantity="@item.Quantity" 
-                OnQuantityChanged="@(qty => UpdateQuantity(item, qty))" 
+              <CartItem ImageUrl="@GetImageUrl(item.Title)" ImageAlt="@item.ImageAlt" Title="@item.Title"
+                Description="@item.Description" UnitPrice="@item.UnitPrice" Quantity="@item.Quantity"
+                OnQuantityChanged="@(qty => UpdateQuantity(item, qty))"
                 OnRemoveClicked="@(() => ShowDeleteConfirmation(item))" />
             }
           </div>
@@ -52,71 +50,78 @@
     </div>
 
     <div class="w-full lg:w-1/3">
-      <OrderSummary 
-        Subtotal="@CalculateSubtotal()" 
-        ServiceFee="2.00m" 
-        OnCheckoutClicked="@HandleCheckout" />
+      <OrderSummary Subtotal="@CalculateSubtotal()" ServiceFee="2.00m" OnCheckoutClicked="@HandleCheckout" />
     </div>
   </div>
 </div>
 
-<CheckoutConfirmationDialog 
-  IsVisible="@showCheckoutConfirmation"
-  Title="Pedido concluído!"
+<CheckoutConfirmationDialog IsVisible="@showCheckoutConfirmation" Title="Pedido concluído!"
   Message="Sua compra foi finalizada com sucesso. Obrigado pela preferência!"
   OnClose="@HandleCheckoutConfirmationClose" />
 
-<DeleteConfirmationDialog
-  IsVisible="@showDeleteConfirmation"
-  Title="Remover item"
-  Message="@($"Tem certeza que deseja remover '{itemToDelete?.Title}' do carrinho?")"
-  OnConfirm="@ConfirmDeleteItem"
+<DeleteConfirmationDialog IsVisible="@showDeleteConfirmation" Title="Remover item"
+  Message="@($"Tem certeza que deseja remover '{itemToDelete?.Title}' do carrinho?")" OnConfirm="@ConfirmDeleteItem"
   OnCancel="@CancelDeleteItem" />
 
 @code {
-    private bool showCheckoutConfirmation = false;
-    private bool showDeleteConfirmation = false;
-    private CartItemModel? itemToDelete = null;
+  private bool showCheckoutConfirmation = false;
+  private bool showDeleteConfirmation = false;
+  private CartItemModel? itemToDelete = null;
 
-    private void UpdateQuantity(CartItemModel item, int newQuantity)
-    {
-        CartService.UpdateQuantity(item, newQuantity);
-    }
+  private void UpdateQuantity(CartItemModel item, int newQuantity)
+  {
+    CartService.UpdateQuantity(item, newQuantity);
+  }
 
-    private void ShowDeleteConfirmation(CartItemModel item)
-    {
-        itemToDelete = item;
-        showDeleteConfirmation = true;
-    }
+  private void ShowDeleteConfirmation(CartItemModel item)
+  {
+    itemToDelete = item;
+    showDeleteConfirmation = true;
+  }
 
-    private void ConfirmDeleteItem()
+  private void ConfirmDeleteItem()
+  {
+    if (itemToDelete != null)
     {
-        if (itemToDelete != null)
-        {
-            CartService.RemoveItem(itemToDelete);
-        }
-        showDeleteConfirmation = false;
+      CartService.RemoveItem(itemToDelete);
     }
+    showDeleteConfirmation = false;
+  }
 
-    private void CancelDeleteItem()
-    {
-        showDeleteConfirmation = false;
-        itemToDelete = null;
-    }
+  private void CancelDeleteItem()
+  {
+    showDeleteConfirmation = false;
+    itemToDelete = null;
+  }
 
-    private decimal CalculateSubtotal()
-    {
-        return CartService.GetSubtotal();
-    }
+  private decimal CalculateSubtotal()
+  {
+    return CartService.GetSubtotal();
+  }
 
-    private void HandleCheckout()
-    {
-        showCheckoutConfirmation = true;
-    }
+  private void HandleCheckout()
+  {
+    showCheckoutConfirmation = true;
+  }
 
-    private void HandleCheckoutConfirmationClose()
+  private void HandleCheckoutConfirmationClose()
+  {
+    showCheckoutConfirmation = false;
+    CartService.ClearCart();
+  }
+
+  private string GetImageUrl(string title)
+  {
+    // Map service titles to appropriate image URLs
+    return title.ToLower() switch
     {
-        showCheckoutConfirmation = false;
-        CartService.ClearCart();
-    }
+      var t when t.Contains("ouro") || t.Contains("gold") => "images/gold-services.png",
+      var t when t.Contains("dungeon") || t.Contains("mythic") => "images/mythic-plus.png",
+      var t when t.Contains("raid") => "images/raid-boosting.png",
+      var t when t.Contains("pvp") || t.Contains("arena") || t.Contains("battleground") => "images/pvp-services.png",
+      var t when t.Contains("item") || t.Contains("itens") || t.Contains("especial") || t.Contains("special") =>
+      "images/special-itens.png",
+      _ => "images/default-product.png"
+    };
+  }
 }

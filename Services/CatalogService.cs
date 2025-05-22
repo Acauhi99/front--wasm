@@ -19,7 +19,7 @@ namespace front__wasm.Services
     {
       try
       {
-        var services = await _httpClient.GetFromJsonAsync<IEnumerable<CatalogServiceDetails>>("data/services.json");
+        var services = await _httpClient.GetFromJsonAsync<IEnumerable<CatalogServiceDetails>>("data/services-details.json");
 
         _logger?.LogInformation($"Loaded {services?.Count() ?? 0} services");
 
