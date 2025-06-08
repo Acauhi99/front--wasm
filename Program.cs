@@ -11,6 +11,7 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 builder.Services.AddScoped<CatalogService>();
 builder.Services.AddScoped<CartService>();
 builder.Services.AddScoped<DetailsService>();
+builder.Services.AddScoped<AuthService>();
 
 builder.Logging.SetMinimumLevel(LogLevel.Debug);
 

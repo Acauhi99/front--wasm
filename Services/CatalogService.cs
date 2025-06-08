@@ -19,11 +19,33 @@ namespace front__wasm.Services
     {
       try
       {
-        var services = await _httpClient.GetFromJsonAsync<IEnumerable<CatalogServiceDetails>>("data/services-details.json");
+        var servicesDict = await _httpClient.GetFromJsonAsync<Dictionary<string, ServiceDetails>>("data/services-details.json");
 
-        _logger?.LogInformation($"Loaded {services?.Count() ?? 0} services");
+        if (servicesDict == null)
+          return new List<CatalogServiceDetails>();
 
-        return services ?? new List<CatalogServiceDetails>();
+        // Convert dictionary entries to CatalogServiceDetails objects
+        var services = servicesDict.Select(kvp => new CatalogServiceDetails
+        {
+          Title = kvp.Value.Title,
+          Description = kvp.Value.Description,
+          DetailsUrl = $"/{kvp.Key}",
+          ImageUrl = kvp.Key switch
+          {
+            "gold" => "images/gold-services.png",
+            "dungeons" => "images/mythic-plus.png",
+            "raids" => "images/raid-boosting.png",
+            "pvp" => "images/pvp-services.png",
+            "itens" => "images/special-itens.png",
+            _ => ""
+          },
+
+          Price = kvp.Value.Packages.FirstOrDefault(p => p.IsPopular)?.Price ??
+                  kvp.Value.Packages.FirstOrDefault()?.Price ?? ""
+        }).ToList();
+
+        _logger?.LogInformation($"Loaded {services.Count} services");
+        return services;
       }
       catch (Exception ex)
       {

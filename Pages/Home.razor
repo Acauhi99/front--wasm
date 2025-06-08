@@ -16,8 +16,7 @@
       Eleve sua experiência em World of Warcraft com nossos serviços premium. Ouro, Dungeons, Raids,
       PvP e muito mais para garantir seu sucesso em Azeroth!
     </p>
-    <a
-      href="/catalog"
+    <a href="/catalog"
       class="bg-blue-700 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg text-lg transition duration-300">
       Ver Catálogo
     </a>
@@ -25,65 +24,60 @@
 </div>
 
 <div class="text-white py-16">
-<div class="container mx-auto px-4 py-7">
-  <h2 class="text-4xl font-bold text-center mb-12">Serviços em Destaque</h2>
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-  @if (featuredServices == null)
-  {
-    <p class="text-center col-span-3">Carregando serviços...</p>
-  }
-  else if (!featuredServices.Any())
-  {
-    <p class="text-center col-span-3">Nenhum serviço disponível no momento.</p>
-  }
-  else
-  {
-    @foreach (var service in featuredServices)
-    {
-        var glowColor = service.Key switch
+  <div class="container mx-auto px-4 py-7">
+    <h2 class="text-4xl font-bold text-center mb-12">Serviços em Destaque</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      @if (featuredServices == null)
+      {
+        <p class="text-center col-span-3">Carregando serviços...</p>
+      }
+      else if (!featuredServices.Any())
+      {
+        <p class="text-center col-span-3">Nenhum serviço disponível no momento.</p>
+      }
+      else
+      {
+        @foreach (var service in featuredServices)
         {
-            "gold" => "#f1c533",        
-            "dungeons" => "red",    
+          var glowColor = service.Key switch
+          {
+            "gold" => "#f1c533",
+            "dungeons" => "red",
             "raids" => "purple",
-            _ => "#808080"                     
-        };
-        
-        var detailsUrl = service.Key switch
-        {
+            _ => "#808080"
+          };
+
+          var detailsUrl = service.Key switch
+          {
             "gold" => "/gold",
             "dungeons" => "/dungeons",
             "raids" => "/raids",
             _ => "/"
-        };
-        
-        var imageUrl = service.Key switch
-        {
+          };
+
+          var imageUrl = service.Key switch
+          {
             "gold" => "images/gold-services.png",
             "dungeons" => "images/mythic-plus.png",
             "raids" => "images/raid-boosting.png",
             "pvp" => "images/pvp-services.png",
             "itens" => "images/special-itens.png",
             _ => ""
-        };
-        
-        <ServiceDestaque 
-            ImageUrl="@imageUrl"
-            ImageAlt="@service.Value.Title"
-            Title="@service.Value.Title"
-            Description="@service.Value.Description" 
-            DetailsUrl="@detailsUrl"
-            GlowColor="@glowColor"/>
-    }
-  }
-</div>
-</div>
+          };
+
+          <ServiceDestaque ImageUrl="@imageUrl" ImageAlt="@service.Value.Title" Title="@service.Value.Title"
+            Description="@service.Value.Description" DetailsUrl="@detailsUrl" GlowColor="@glowColor" />
+        }
+      }
+    </div>
+  </div>
 </div>
 
 <div class="bg-gradient-to-b from-purple-900 to-blue-900 text-white py-16">
   <div class="container mx-auto px-4">
     <h2 class="text-4xl font-bold text-center mb-12">Avaliações de Clientes</h2>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      
+
       <div class="bg-[#1c1c18] p-6 rounded-lg shadow-md">
         <div class="flex text-yellow-400 mb-4">
           <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
@@ -130,7 +124,7 @@
   protected override async Task OnInitializedAsync()
   {
     catalogServices = await CatalogService.GetServicesAsync();
-    
+
     foreach (var serviceType in featuredServiceTypes)
     {
       var details = await DetailsService.GetServiceDetailsAsync(serviceType);
@@ -141,4 +135,3 @@
     }
   }
 }
-
