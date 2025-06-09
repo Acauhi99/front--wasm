@@ -23,13 +23,22 @@ namespace front__wasm.Services
 
       try
       {
-        var services = await _httpClient.GetFromJsonAsync<Dictionary<string, Service>>("data/services-details.json");
-        _cachedServices = services ?? new Dictionary<string, Service>();
+        _logger?.LogInformation("Attempting to load services from json file at: data/services-details.json");
+        var services = await _httpClient.GetFromJsonAsync<Dictionary<string, Service>>("/data/services-details.json");
+
+        if (services == null)
+        {
+          _logger?.LogWarning("JSON file loaded, but services came back null");
+          return new Dictionary<string, Service>();
+        }
+
+        _logger?.LogInformation($"Successfully loaded {services.Count} services from JSON file");
+        _cachedServices = services;
         return _cachedServices;
       }
       catch (Exception ex)
       {
-        _logger?.LogError(ex, "Erro ao carregar serviços: {Message}", ex.Message);
+        _logger?.LogError(ex, "Error loading services from JSON: {Message}", ex.Message);
         return new Dictionary<string, Service>();
       }
     }

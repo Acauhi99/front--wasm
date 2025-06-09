@@ -17,7 +17,6 @@ namespace front__wasm.Services
     {
       _httpClient = httpClient;
       _jsRuntime = jsRuntime;
-      _httpClient.BaseAddress = new Uri("http://localhost:5090/");
     }
 
     public async Task InitializeAsync()
