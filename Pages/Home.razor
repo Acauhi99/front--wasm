@@ -2,8 +2,7 @@
 @layout Layout.MainLayout
 @using front__wasm.Models
 @using front__wasm.Services
-@inject CatalogService CatalogService
-@inject DetailsService DetailsService
+@inject ServiceManager ServiceManager
 
 <div class="relative bg-gradient-to-b from-yellow-900 to-purple-900 text-white py-30 overflow-hidden">
   <div class="absolute inset-0 z-0">
@@ -39,34 +38,8 @@
       {
         @foreach (var service in featuredServices)
         {
-          var glowColor = service.Key switch
-          {
-            "gold" => "#f1c533",
-            "dungeons" => "red",
-            "raids" => "purple",
-            _ => "#808080"
-          };
-
-          var detailsUrl = service.Key switch
-          {
-            "gold" => "/gold",
-            "dungeons" => "/dungeons",
-            "raids" => "/raids",
-            _ => "/"
-          };
-
-          var imageUrl = service.Key switch
-          {
-            "gold" => "images/gold-services.png",
-            "dungeons" => "images/mythic-plus.png",
-            "raids" => "images/raid-boosting.png",
-            "pvp" => "images/pvp-services.png",
-            "itens" => "images/special-itens.png",
-            _ => ""
-          };
-
-          <ServiceDestaque ImageUrl="@imageUrl" ImageAlt="@service.Value.Title" Title="@service.Value.Title"
-            Description="@service.Value.Description" DetailsUrl="@detailsUrl" GlowColor="@glowColor" />
+          <ServiceDestaque ImageUrl="@service.ImageUrl" ImageAlt="@service.Title" Title="@service.Title"
+            Description="@service.Description" DetailsUrl="@service.DetailsUrl" GlowColor="@service.GlowColor" />
         }
       }
     </div>
@@ -77,7 +50,6 @@
   <div class="container mx-auto px-4">
     <h2 class="text-4xl font-bold text-center mb-12">Avaliações de Clientes</h2>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-
       <div class="bg-[#1c1c18] p-6 rounded-lg shadow-md">
         <div class="flex text-yellow-400 mb-4">
           <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
@@ -111,27 +83,15 @@
         </p>
         <p class="font-bold text-white">- Thrall_Durotan</p>
       </div>
-
     </div>
   </div>
 </div>
 
 @code {
-  private Dictionary<string, ServiceDetails> featuredServices = new();
-  private IEnumerable<CatalogServiceDetails> catalogServices = new List<CatalogServiceDetails>();
-  private readonly string[] featuredServiceTypes = new[] { "gold", "dungeons", "raids" };
+  private List<ServiceCardViewModel>? featuredServices;
 
   protected override async Task OnInitializedAsync()
   {
-    catalogServices = await CatalogService.GetServicesAsync();
-
-    foreach (var serviceType in featuredServiceTypes)
-    {
-      var details = await DetailsService.GetServiceDetailsAsync(serviceType);
-      if (details != null)
-      {
-        featuredServices[serviceType] = details;
-      }
-    }
+    featuredServices = await ServiceManager.GetFeaturedServicesAsync();
   }
 }

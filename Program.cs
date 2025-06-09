@@ -8,9 +8,8 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
-builder.Services.AddScoped<CatalogService>();
+builder.Services.AddScoped<ServiceManager>();
 builder.Services.AddScoped<CartService>();
-builder.Services.AddScoped<DetailsService>();
 builder.Services.AddScoped<AuthService>();
 
 builder.Logging.SetMinimumLevel(LogLevel.Debug);

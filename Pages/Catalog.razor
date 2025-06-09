@@ -1,8 +1,7 @@
 @page "/catalog"
 @using front__wasm.Models
 @using front__wasm.Services
-@inject CatalogService CatalogService
-@inject DetailsService DetailsService
+@inject ServiceManager ServiceManager
 
 <div class="bg-gradient-to-b from-purple-900 to-blue-900 min-h-screen text-white">
   <div class="container mx-auto px-4 py-12">
@@ -13,36 +12,16 @@
       {
         <p class="text-center col-span-3">Carregando serviços...</p>
       }
-      else if (services.Count == 0)
+      else if (!services.Any())
       {
         <p class="text-center col-span-3">Nenhum serviço disponível no momento.</p>
       }
       else
       {
-        @foreach (var serviceKey in services.Keys)
+        @foreach (var service in services)
         {
-          var service = services[serviceKey];
-          var imageUrl = serviceKey switch
-          {
-              "gold" => "images/gold-services.png",
-              "dungeons" => "images/mythic-plus.png",
-              "raids" => "images/raid-boosting.png",
-              "pvp" => "images/pvp-services.png",
-              "itens" => "images/special-itens.png",
-              _ => ""
-          };
-          
-          var detailsUrl = $"/{serviceKey}";
-          
-          var price = service.Packages.FirstOrDefault(p => p.IsPopular)?.Price ?? service.Packages.FirstOrDefault()?.Price ?? "Consulte";
-          
-          <ServiceCard 
-            ImageUrl="@imageUrl"
-            ImageAlt="@service.Title"
-            Title="@service.Title"
-            Description="@service.Description"
-            Price="@price"
-            DetailsUrl="@detailsUrl" />
+          <ServiceCard ImageUrl="@service.ImageUrl" ImageAlt="@service.Title" Title="@service.Title"
+            Description="@service.Description" Price="@service.Price" DetailsUrl="@service.DetailsUrl" />
         }
       }
     </div>
@@ -50,19 +29,10 @@
 </div>
 
 @code {
-  private Dictionary<string, ServiceDetails> services = new();
-  private readonly string[] serviceTypes = new[] { "gold", "dungeons", "raids", "pvp", "itens" };
+  private List<ServiceCardViewModel>? services;
 
   protected override async Task OnInitializedAsync()
   {
-    // Load all services from services-details.json
-    foreach (var serviceType in serviceTypes)
-    {
-      var details = await DetailsService.GetServiceDetailsAsync(serviceType);
-      if (details != null)
-      {
-        services[serviceType] = details;
-      }
-    }
+    services = await ServiceManager.GetServiceCardsAsync();
   }
 }
