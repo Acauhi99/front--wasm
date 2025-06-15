@@ -1,7 +1,13 @@
 @using front__wasm.Services
 @inject CartService CartService
-@inject IJSRuntime JSRuntime
+@inject AuthService AuthService
+@inject NavigationManager NavigationManager
 @implements IDisposable
+
+@if (showUserDropdown)
+{
+  <div class="fixed inset-0 z-10" @onclick="CloseDropdowns"></div>
+}
 
 <header class="bg-[#11110c] text-white shadow-lg">
   <div class="container mx-auto px-4 h-20 flex flex-row justify-between items-center">
@@ -10,58 +16,144 @@
         <img src="images/wowahlogo.png" alt="WoW Logo" class="h-16 md:h-15 object-contain" />
       </NavLink>
     </div>
-    <nav>
-      <ul class="flex flex-wrap justify-center space-x-4 md:space-x-6">
-    <li><a href="/" class="hover:text-[#f1c533] transition">Home</a></li>
+
+    <button @onclick="ToggleMobileMenu" class="md:hidden flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    </button>
+
+    <nav class="hidden md:block">
+      <ul class="flex flex-wrap justify-center space-x-4 md:space-x-6 items-center">
+        <li><a href="/" class="hover:text-[#f1c533] transition">Home</a></li>
         <li><a href="/catalog" class="hover:text-[#f1c533] transition">Catálogo</a></li>
-        <li><a href="/gold" class="hover:text-[#f1c533] transition">Gold</a></li>
-        <li><a href="/dungeons" class="hover:text-[#f1c533] transition">Dungeons</a></li>
-        <li><a href="/raids" class="hover:text-[#f1c533] transition">Raids</a></li>
-        <li><a href="/pvp" class="hover:text-[#f1c533] transition">PvP</a></li>
-        <li><a href="/itens" class="hover:text-[#f1c533] transition">Itens</a></li>
-        <li>
-  <a href="/cart" class="text-[#f1c533] hover:text-white transition relative">
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      class="h-6 w-6"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor">
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="2"
-        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-    </svg>
-    @if (isInitialized)
-    {
-      <span
-        class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
-        >@CartService.Count</span>
-    }
-  </a>
-</li>
+        <a href="/cart" class="text-[#f1c533] hover:text-white transition relative">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+          @if (isCartInitialized)
+          {
+            <span
+              class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">@CartService.Count</span>
+          }
+        </a>
 
-
+        @if (isAuthInitialized && AuthService.IsAuthenticated)
+        {
+          <li class="relative">
+            <button @onclick="ToggleUserDropdown" @onclick:stopPropagation
+              class="flex items-center space-x-1 hover:text-[#f1c533] transition">
+              <span>@AuthService.CurrentUser?.Name</span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            @if (showUserDropdown)
+            {
+              <div @onclick:stopPropagation class="absolute right-0 mt-2 w-48 bg-[#1e1e18] rounded-md shadow-lg py-1 z-20">
+                <a href="/profile" class="block px-4 py-2 text-sm text-white hover:bg-[#2a2a24]">Profile</a>
+                <button @onclick="HandleLogout"
+                  class="block w-full text-left px-4 py-2 text-sm text-white hover:bg-[#2a2a24]">Logout</button>
+              </div>
+            }
+          </li>
+        }
+        else if (isAuthInitialized)
+        {
+          <li><a href="/login" class="hover:text-[#f1c533] transition">Login</a></li>
+          <li><a href="/register" class="bg-[#f1c533] hover:bg-[#ddb326] text-black px-4 py-2 rounded-md transition">Sign
+              Up</a></li>
+        }
       </ul>
     </nav>
+  </div>
+
+  <div class="md:hidden @(showMobileMenu ? "block" : "hidden") bg-[#11110c] border-t border-gray-800 shadow-lg">
+    <ul class="flex flex-col py-3">
+      <li><a href="/" class="block px-4 py-3 hover:bg-[#1e1e18] hover:text-[#f1c533] transition">Home</a></li>
+      <li><a href="/catalog" class="block px-4 py-3 hover:bg-[#1e1e18] hover:text-[#f1c533] transition">Catálogo</a>
+      </li>
+      <li>
+        <a href="/cart" class="flex items-center px-4 py-3 hover:bg-[#1e1e18] text-[#f1c533] transition">
+          <span class="mr-2">Carrinho</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+          @if (isCartInitialized && CartService.Count > 0)
+          {
+            <span
+              class="ml-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">@CartService.Count</span>
+          }
+        </a>
+      </li>
+      @if (isAuthInitialized && AuthService.IsAuthenticated)
+      {
+        <li class="border-t border-gray-800 mt-2">
+          <span class="block px-4 py-3 text-[#f1c533]">@AuthService.CurrentUser?.Name</span>
+        </li>
+        <li><a href="/profile" class="block px-4 py-3 hover:bg-[#1e1e18] hover:text-[#f1c533] transition">Profile</a></li>
+        <li><button @onclick="HandleLogout"
+            class="block w-full text-left px-4 py-3 hover:bg-[#1e1e18] hover:text-[#f1c533] transition">Logout</button>
+        </li>
+      }
+      else if (isAuthInitialized)
+      {
+        <li class="border-t border-gray-800 mt-2">
+          <a href="/login" class="block px-4 py-3 hover:bg-[#1e1e18] hover:text-[#f1c533] transition">Login</a>
+        </li>
+        <li><a href="/register" class="block px-4 py-3 hover:bg-[#1e1e18] text-[#f1c533] transition">Sign Up</a></li>
+      }
+    </ul>
   </div>
 </header>
 
 @code {
-    private bool isInitialized = false;
-    
-    protected override async Task OnInitializedAsync()
-    {
-        CartService.OnChange += StateHasChanged;
-        
-        await CartService.InitializeAsync();
-        isInitialized = true;
-        StateHasChanged();
-    }
-    
-    public void Dispose()
-    {
-        CartService.OnChange -= StateHasChanged;
-    }
+  private bool isCartInitialized = false;
+  private bool isAuthInitialized = false;
+  private bool showMobileMenu = false;
+  private bool showUserDropdown = false;
+
+  protected override async Task OnInitializedAsync()
+  {
+    CartService.OnChange += StateHasChanged;
+    AuthService.OnChange += StateHasChanged;
+
+    await CartService.InitializeAsync();
+    await AuthService.InitializeAsync();
+
+    isCartInitialized = true;
+    isAuthInitialized = true;
+    StateHasChanged();
+  }
+
+  public void Dispose()
+  {
+    CartService.OnChange -= StateHasChanged;
+    AuthService.OnChange -= StateHasChanged;
+  }
+
+  private void ToggleMobileMenu()
+  {
+    showMobileMenu = !showMobileMenu;
+  }
+
+  private void ToggleUserDropdown()
+  {
+    showUserDropdown = !showUserDropdown;
+  }
+
+  private void CloseDropdowns()
+  {
+    showUserDropdown = false;
+  }
+
+  private async Task HandleLogout()
+  {
+    showUserDropdown = false;
+    await AuthService.LogoutAsync();
+    NavigationManager.NavigateTo("/");
+  }
 }

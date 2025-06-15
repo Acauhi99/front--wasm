@@ -1,7 +1,7 @@
 @page "/catalog"
 @using front__wasm.Models
 @using front__wasm.Services
-@inject CatalogService CatalogService
+@inject ServiceManager ServiceManager
 
 <div class="bg-gradient-to-b from-purple-900 to-blue-900 min-h-screen text-white">
   <div class="container mx-auto px-4 py-12">
@@ -20,13 +20,8 @@
       {
         @foreach (var service in services)
         {
-          <ServiceCard 
-            ImageUrl="@service.ImageUrl"
-            ImageAlt="@service.ImageAlt"
-            Title="@service.Title"
-            Description="@service.Description"
-            Price="@service.Price"
-            DetailsUrl="@service.DetailsUrl" />
+          <ServiceCard ImageUrl="@service.ImageUrl" ImageAlt="@service.Title" Title="@service.Title"
+            Description="@service.Description" Price="@service.Price" DetailsUrl="@service.DetailsUrl" />
         }
       }
     </div>
@@ -34,10 +29,10 @@
 </div>
 
 @code {
-  private IEnumerable<CatalogServiceDetails> services = new List<CatalogServiceDetails>();
+  private List<ServiceCardViewModel>? services;
 
   protected override async Task OnInitializedAsync()
   {
-    services = await CatalogService.GetServicesAsync();
+    services = await ServiceManager.GetServiceCardsAsync();
   }
 }

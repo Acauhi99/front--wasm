@@ -1,0 +1,195 @@
+{
+  "gold": {
+    "title": "Serviços de Gold",
+    "description": "Obtenha ouro rapidamente de forma segura e garantida. Entregas rápidas em todos os servidores.",
+    "featuresTitle": "Por que escolher nosso serviço de Gold?",
+    "features": [
+      "Entrega garantida em até 24 horas",
+      "Métodos 100% seguros, sem risco para sua conta",
+      "Disponível para todos os servidores"
+    ],
+    "detailsTitle": "Como funciona?",
+    "details": [
+      "1. Escolha a quantidade de gold desejada",
+      "2. Forneça as informações de seu personagem e servidor",
+      "3. Realize o pagamento",
+      "4. Aguarde o contato de nossa equipe via Discord",
+      "5. Receba seu gold no jogo!"
+    ],
+    "packagesTitle": "Escolha seu pacote",
+    "packages": [
+      {
+        "name": "10.000 Gold",
+        "price": "R$ 19,90",
+        "isPopular": false
+      },
+      {
+        "name": "100.000 Gold",
+        "price": "R$ 149,90",
+        "isPopular": true
+      },
+      {
+        "name": "500.000 Gold",
+        "price": "R$ 599,90",
+        "isPopular": false
+      }
+    ]
+  },
+  "dungeons": {
+    "title": "Mythic+ Dungeons",
+    "description": "Domine as masmorras mais desafiadoras com nossa equipe experiente. Garantimos completar suas dungeons com chaves altas rapidamente.",
+    "featuresTitle": "O que nosso serviço de Mythic+ oferece?",
+    "features": [
+      "Runs rápidas com garantia de conclusão no tempo",
+      "Equipe composta por jogadores Gladiator/Elite com anos de experiência",
+      "Loot garantido direcionado para seu personagem",
+      "Streams privadas para você acompanhar a run"
+    ],
+    "detailsTitle": "Como funciona?",
+    "details": [
+      "1. Escolha o nível da chave e a quantidade de runs",
+      "2. Selecione as masmorras específicas ou deixe-nos escolher as mais rápidas",
+      "3. Informe detalhes do seu personagem e preferências de loot",
+      "4. Realize o pagamento",
+      "5. Agende com nossa equipe e receba seu boost!"
+    ],
+    "packagesTitle": "Escolha seu pacote",
+    "packages": [
+      {
+        "name": "Mythic+10 (Única)",
+        "price": "R$ 49,90",
+        "isPopular": false
+      },
+      {
+        "name": "Pacote 4x Mythic+15",
+        "price": "R$ 189,90",
+        "isPopular": true
+      },
+      {
+        "name": "Mythic+20 (Única)",
+        "price": "R$ 99,90",
+        "isPopular": false
+      }
+    ]
+  },
+  "raids": {
+    "title": "Raid Boosting",
+    "description": "Conquiste as raids mais desafiadoras e garanta os melhores equipamentos com nossa equipe de elite. Do Normal ao Mítico, nós te levamos ao topo.",
+    "featuresTitle": "Por que escolher nosso boost de raids?",
+    "features": [
+      "Equipe composta por raiders de guilds de top mundial",
+      "Garantia de loot específico para seu personagem",
+      "Disponibilidade para todas as dificuldades: Normal, Heroico e Mítico",
+      "Conquistas e montarias raras garantidas"
+    ],
+    "detailsTitle": "Raids disponíveis:",
+    "details": [
+      "Aberrus, o Crisol Sombreado (Última temporada)",
+      "Cofre das Encarnações",
+      "Sepulcro dos Fundadores",
+      "Outras raids sob consulta"
+    ],
+    "packagesTitle": "Escolha seu pacote",
+    "packages": [
+      {
+        "name": "Full Run Normal",
+        "price": "R$ 89,90",
+        "isPopular": false
+      },
+      {
+        "name": "Full Run Heroico",
+        "price": "R$ 199,90",
+        "isPopular": true
+      },
+      {
+        "name": "Boss Específico Mítico",
+        "price": "R$ 129,90",
+        "isPopular": false
+      },
+      {
+        "name": "Full Run Mítico",
+        "price": "R$ 599,90",
+        "isPopular": false
+      }
+    ]
+  },
+  "pvp": {
+    "title": "Serviços de PvP",
+    "description": "Alcance ratings elevados, conquiste títulos exclusivos e obtenha equipamentos PvP de elite com nossos serviços profissionais de arena e battleground.",
+    "featuresTitle": "Eleve seu jogo PvP com nossos serviços",
+    "features": [
+      "Jogadores Gladiadores e R1 em nosso time",
+      "Disponível para 2v2, 3v3 e RBGs",
+      "Conquistas como \"Gladiador\" e \"Elite\" garantidas",
+      "Opções para jogabilidade própria (coaching) ou pilotagem"
+    ],
+    "detailsTitle": "Nossos diferenciais",
+    "details": [
+      "Oferecemos gravações das partidas para você estudar e aprender com os melhores jogadores. Também disponibilizamos sessões de coaching para melhorar suas habilidades PvP.",
+      "Todos os boosts são realizados manualmente, sem uso de programas ou trapaças, garantindo total segurança para sua conta."
+    ],
+    "packagesTitle": "Escolha seu pacote",
+    "packages": [
+      {
+        "name": "1800 Rating (2v2 ou 3v3)",
+        "price": "R$ 149,90",
+        "isPopular": false
+      },
+      {
+        "name": "2100 Rating (Elite)",
+        "price": "R$ 299,90",
+        "isPopular": true
+      },
+      {
+        "name": "2400+ (Gladiador)",
+        "price": "R$ 499,90",
+        "isPopular": false
+      },
+      {
+        "name": "RBG 1800+ Rating",
+        "price": "R$ 249,90",
+        "isPopular": false
+      }
+    ]
+  },
+  "itens": {
+    "title": "Itens Especiais",
+    "description": "Obtenha os itens mais raros e cobiçados do jogo. Armas legendárias, montarias raras, transmogs exclusivos e muito mais.",
+    "featuresTitle": "Categorias de Itens Disponíveis",
+    "features": [
+      "Montarias raras com chance de drop baixíssima",
+      "Transmogs exclusivos e itens cosméticos",
+      "Armas e equipamentos lendários",
+      "Pets de batalha raros",
+      "Itens de colecionador"
+    ],
+    "detailsTitle": "Nosso processo de farm",
+    "details": [
+      "Utilizamos equipes especializadas que trabalham incansavelmente para obter os itens mais raros do jogo. Alguns itens podem levar dias ou semanas para serem adquiridos devido à sua raridade.",
+      "Todos os itens são obtidos de forma legítima, seguindo as regras do jogo, garantindo a segurança de sua conta."
+    ],
+    "packagesTitle": "Itens em Destaque",
+    "packages": [
+      {
+        "name": "Montaria Rara - Rédeas do Raptor Zandalari",
+        "price": "R$ 199,90",
+        "isPopular": false
+      },
+      {
+        "name": "Montaria - Cabeça de Al'ar",
+        "price": "R$ 349,90",
+        "isPopular": true
+      },
+      {
+        "name": "Set de Transmog - Paladino T3",
+        "price": "R$ 299,90",
+        "isPopular": false
+      },
+      {
+        "name": "Pacote de 3 Pets Raros",
+        "price": "R$ 89,90",
+        "isPopular": false
+      }
+    ]
+  }
+}

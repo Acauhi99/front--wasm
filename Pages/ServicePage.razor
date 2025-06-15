@@ -1,0 +1,170 @@
+@page "/gold"
+@page "/dungeons"
+@page "/raids"
+@page "/pvp"
+@page "/itens"
+@using front__wasm.Models
+@using front__wasm.Services
+@using front__wasm.Shared
+@using System.Text.RegularExpressions
+@inject ServiceManager ServiceManager
+@inject CartService CartService
+@inject NavigationManager NavigationManager
+
+@if (viewModel == null)
+{
+    <p class="text-center text-white py-10">Carregando detalhes do serviço...</p>
+}
+else
+{
+    <ServiceTemplate 
+      Title="@viewModel.Service.Title" 
+      Description="@viewModel.Service.Description"
+      GradientClasses="@viewModel.GradientClasses"
+      IconColor="@viewModel.IconColor"
+      HoverBorderColor="@viewModel.HoverBorderColor">
+      <ServiceFeatures>
+        <h2 class="text-3xl font-bold mb-6">@viewModel.Service.FeaturesTitle</h2>
+        <ul class="space-y-4">
+          @foreach (var feature in viewModel.Service.Features)
+          {
+            <CheckListItem Text="@feature" IconColor="@viewModel.IconColor" />
+          }
+        </ul>
+      </ServiceFeatures>
+      <ServiceDetails>
+        <h3 class="text-2xl font-bold mb-4">@viewModel.Service.DetailsTitle</h3>
+        <ul class="@(viewModel.Id == "itens" || viewModel.Id == "pvp" ? "" : "list-disc pl-5") space-y-2">
+          @foreach (var detail in viewModel.Service.Details)
+          {
+            <li>@detail</li>
+          }
+        </ul>
+      </ServiceDetails>
+      <PackageSelector>
+        <h3 class="text-2xl font-bold mb-6 text-center text-gray-200">@viewModel.Service.PackagesTitle</h3>
+        <div class="space-y-4">
+          @foreach (var package in viewModel.Service.Packages)
+          {
+            <div
+              @key="package.Name"
+              @onclick="() => SelectPackage(package)"
+              class="@GetPackageClasses(package)">
+              <div class="flex justify-between items-center">
+                <div>
+                  <span class="font-bold text-gray-200">@package.Name</span>
+                </div>
+                <span class="text-xl font-bold text-gray-200">@package.Price</span>
+              </div>
+            </div>
+          }
+        </div>
+      </PackageSelector>
+      <ActionButtons>
+        <button
+        @onclick="AddToCart"
+        disabled="@(selectedPackage == null)"
+        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 mb-4 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
+        Adicionar ao Carrinho
+      </button>
+      <button
+        @onclick="BuyNow"
+        disabled="@(selectedPackage == null)"
+        class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
+        Comprar Agora
+      </button>
+      </ActionButtons>
+    </ServiceTemplate>
+    <CartAddDialog 
+        IsVisible="@showCartDialog" 
+        Title="Item Adicionado ao Carrinho" 
+        Message="@cartDialogMessage" 
+        OnClose="CloseCartDialog" 
+        OnViewCart="GoToCart" />
+}
+
+@code {
+    private ServiceDetailsViewModel? viewModel;
+    private ServicePackage? selectedPackage;
+    private bool showCartDialog = false;
+    private string cartDialogMessage = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Extrai o tipo de serviço da URL atual
+        var uri = NavigationManager.Uri;
+        var path = new Uri(uri).AbsolutePath;
+        var serviceType = path.TrimStart('/');
+
+        // Carrega os detalhes do serviço
+        viewModel = await ServiceManager.GetServiceDetailsAsync(serviceType);
+    }
+
+    private void SelectPackage(ServicePackage package)
+    {
+        selectedPackage = package;
+        StateHasChanged();
+    }
+
+    private string GetPackageClasses(ServicePackage package)
+    {
+        if (viewModel == null) return string.Empty;
+        
+        var iconColorParts = viewModel.IconColor.Split('-');
+        var colorName = iconColorParts.Length > 1 ? iconColorParts[1] : "gray";
+        var selectedBorderClass = $"border-{colorName}-500 border-4";
+        var defaultBorderClass = "border-gray-700 border-2";
+        var hoverBorderClass = $"hover:{selectedBorderClass}";
+        var defaultBgClass = "bg-[#2d2d25]";
+        var hoverBgClass = $"hover:bg-{colorName}-600/40";
+
+        if (selectedPackage == package)
+        {
+            return $"rounded-lg p-4 cursor-pointer transition {selectedBorderClass} {defaultBgClass}";
+        }
+        else
+        {
+            return $"rounded-lg p-4 cursor-pointer transition {defaultBorderClass} {hoverBorderClass} {defaultBgClass} {hoverBgClass}";
+        }
+    }
+
+    private void AddToCart()
+    {
+        if (selectedPackage == null || viewModel == null) return;
+
+        var cartItem = new CartItemModel
+        {
+            ImageUrl = viewModel.ImageUrl,
+            ImageAlt = $"{viewModel.Service.Title} - {selectedPackage.Name}",
+            Title = $"{viewModel.Service.Title} - {selectedPackage.Name}",
+            Description = selectedPackage.Name,
+            UnitPrice = selectedPackage.Price,
+            Quantity = 1
+        };
+        
+        CartService.AddItem(cartItem);
+        
+        cartDialogMessage = $"{selectedPackage.Name} foi adicionado ao seu carrinho!";
+        showCartDialog = true;
+        StateHasChanged();
+    }
+
+    private void BuyNow()
+    {
+        AddToCart();
+        if (selectedPackage != null)
+        {
+            NavigationManager.NavigateTo("/cart");
+        }
+    }
+
+    private void CloseCartDialog()
+    {
+        showCartDialog = false;
+    }
+    
+    private void GoToCart()
+    {
+        NavigationManager.NavigateTo("/cart");
+    }
+}
