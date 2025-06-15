@@ -1,0 +1,328 @@
+@page "/profile"
+@using System.ComponentModel.DataAnnotations
+@using api__dapper.domain.models
+@using front__wasm.Services
+@inject ProfileService ProfileService
+@inject AuthService AuthService
+@inject NavigationManager NavigationManager
+
+<div class="min-h-screen bg-[#11110c] py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-3xl mx-auto">
+    <div class="bg-[#1e1e18] rounded-lg shadow-lg overflow-hidden">
+      
+      @if (!isLoaded)
+      {
+        <div class="flex justify-center items-center h-64">
+          <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#f1c533]"></div>
+        </div>
+      }
+      else if (AuthService.CurrentUser == null)
+      {
+        <div class="text-center py-10">
+          <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mx-6 mb-6" role="alert">
+            <p>You must be logged in to view this page.</p>
+          </div>
+          <a href="/login" class="inline-block bg-[#f1c533] hover:bg-[#ddb326] text-black font-bold py-2 px-4 rounded">
+            Login
+          </a>
+        </div>
+      }
+      else
+      {
+        <!-- Profile Header -->
+        <div class="bg-gradient-to-r from-[#2a2a24] to-[#1e1e18] p-6">
+          <div class="flex items-center">
+            <div class="bg-[#f1c533] text-[#11110c] rounded-full h-16 w-16 flex items-center justify-center text-2xl font-bold">
+              @(currentUser.Name?.Length > 0 ? currentUser.Name[0].ToString().ToUpper() : "U")
+            </div>
+            <div class="ml-6">
+              <h1 class="text-2xl font-bold text-white">@currentUser.Name</h1>
+              <p class="text-gray-400">@currentUser.Role</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Status Messages -->
+        <div class="px-6 pt-4">
+          @if (errorMessage != null)
+          {
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6" role="alert">
+              <p>@errorMessage</p>
+            </div>
+          }
+
+          @if (successMessage != null)
+          {
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6" role="alert">
+              <p>@successMessage</p>
+            </div>
+          }
+        </div>
+
+        @if (!isEditMode)
+        {
+          <!-- View Mode -->
+          <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="space-y-4">
+                <div>
+                  <h3 class="text-sm font-medium text-gray-400">Full Name</h3>
+                  <p class="mt-1 text-white">@currentUser.Name</p>
+                </div>
+                <div>
+                  <h3 class="text-sm font-medium text-gray-400">Email</h3>
+                  <p class="mt-1 text-white">@currentUser.Email</p>
+                </div>
+              </div>
+              <div class="space-y-4">
+                <div>
+                  <h3 class="text-sm font-medium text-gray-400">Role</h3>
+                  <p class="mt-1 text-white">@currentUser.Role</p>
+                </div>
+                <div>
+                  <h3 class="text-sm font-medium text-gray-400">Member Since</h3>
+                  <p class="mt-1 text-white">@(currentUser.CreatedAt.Year > 1 ? currentUser.CreatedAt.ToString("MMMM dd, yyyy") : "Not available")</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-8 flex justify-end">
+              <button @onclick="EnableEditMode"
+                class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-black bg-[#f1c533] hover:bg-[#ddb326] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#f1c533]">
+                Edit Profile
+              </button>
+            </div>
+          </div>
+        }
+        else
+        {
+          <!-- Edit Mode -->
+          <div class="p-6">
+            <EditForm Model="@editUserModel" OnValidSubmit="HandleUpdateProfile" class="space-y-6">
+              <DataAnnotationsValidator />
+              <ValidationSummary class="text-red-500" />
+
+              <div>
+                <label for="name" class="block text-sm font-medium text-gray-300">Name</label>
+                <div class="mt-1">
+                  <InputText id="name" @bind-Value="editUserModel.Name"
+                    class="w-full px-3 py-2 border border-gray-600 bg-[#2a2a24] rounded-md text-white focus:outline-none focus:ring-2 focus:ring-[#f1c533]" />
+                </div>
+                <ValidationMessage For="@(() => editUserModel.Name)" class="text-red-500 text-xs mt-1" />
+              </div>
+
+              <div>
+                <label for="email" class="block text-sm font-medium text-gray-300">Email</label>
+                <div class="mt-1">
+                  <InputText id="email" @bind-Value="editUserModel.Email"
+                    class="w-full px-3 py-2 border border-gray-600 bg-[#2a2a24] rounded-md text-white focus:outline-none focus:ring-2 focus:ring-[#f1c533]" />
+                </div>
+                <ValidationMessage For="@(() => editUserModel.Email)" class="text-red-500 text-xs mt-1" />
+              </div>
+
+              <div class="border-t border-gray-700 pt-4">
+                <div class="flex items-center mb-4">
+                  <input id="changePassword" type="checkbox" @bind="changePassword"
+                    class="h-4 w-4 text-[#f1c533] focus:ring-[#f1c533] border-gray-600 rounded">
+                  <label for="changePassword" class="ml-2 block text-sm text-gray-300">Change password</label>
+                </div>
+
+                @if (changePassword)
+                {
+                  <div>
+                    <label for="password" class="block text-sm font-medium text-gray-300">New Password</label>
+                    <div class="mt-1">
+                      <InputText id="password" @bind-Value="editUserModel.Password" type="password"
+                        class="w-full px-3 py-2 border border-gray-600 bg-[#2a2a24] rounded-md text-white focus:outline-none focus:ring-2 focus:ring-[#f1c533]" />
+                    </div>
+                    <ValidationMessage For="@(() => editUserModel.Password)" class="text-red-500 text-xs mt-1" />
+                  </div>
+                }
+              </div>
+
+              <div class="flex justify-end space-x-4">
+                <button type="button" @onclick="CancelEdit"
+                  class="py-2 px-4 border border-gray-500 rounded-md text-gray-300 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                  Cancel
+                </button>
+                <button type="submit"
+                  class="relative flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-black bg-[#f1c533] hover:bg-[#ddb326] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#f1c533]">
+                  @if (isUpdating)
+                  {
+                    <span class="flex items-center">
+                      <div class="mr-2 animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-black"></div>
+                      Updating...
+                    </span>
+                  }
+                  else
+                  {
+                    <span>Save Changes</span>
+                  }
+                </button>
+              </div>
+            </EditForm>
+          </div>
+        }
+      }
+    </div>
+  </div>
+</div>
+
+@code {
+  private bool isLoaded = false;
+  private bool isUpdating = false;
+  private bool isEditMode = false;
+  private bool changePassword = false;
+  private string? errorMessage;
+  private string? successMessage;
+  private User currentUser = new();
+  private UserEditModel editUserModel = new();
+
+  protected override async Task OnInitializedAsync()
+  {
+    try 
+    {
+      await AuthService.InitializeAsync();
+
+      if (AuthService.IsAuthenticated && AuthService.CurrentUser != null)
+      {
+        currentUser = new User 
+        {
+          Id = AuthService.CurrentUser.Id,
+          Name = AuthService.CurrentUser.Name,
+          Email = AuthService.CurrentUser.Email,
+          Role = AuthService.CurrentUser.Role
+        };
+        
+        await LoadUserData();
+      }
+    }
+    catch (Exception ex)
+    {
+      errorMessage = $"Error initializing: {ex.Message}";
+    }
+    finally
+    {
+      isLoaded = true;
+    }
+  }
+
+  private async Task LoadUserData()
+  {
+    try
+    {
+      if (AuthService.CurrentUser?.Id == null)
+      {
+        errorMessage = "User ID not available. Please log in again.";
+        return;
+      }
+
+      var user = await ProfileService.GetCurrentUserAsync();
+      
+      if (user != null)
+      {
+        currentUser = user;
+        ResetEditModel();
+      }
+      else
+      {
+        errorMessage = "Could not retrieve user profile. Please try again later.";
+      }
+    }
+    catch (Exception ex)
+    {
+      errorMessage = $"Error loading profile: {ex.Message}";
+    }
+  }
+
+  private void ResetEditModel()
+  {
+    editUserModel = new UserEditModel
+    {
+      Id = currentUser.Id,
+      Name = currentUser.Name,
+      Email = currentUser.Email
+    };
+    changePassword = false;
+  }
+
+  private void EnableEditMode()
+  {
+    isEditMode = true;
+    errorMessage = null;
+    successMessage = null;
+  }
+
+  private void CancelEdit()
+  {
+    isEditMode = false;
+    ResetEditModel();
+    errorMessage = null;
+    successMessage = null;
+  }
+
+  private async Task HandleUpdateProfile()
+  {
+    isUpdating = true;
+    errorMessage = null;
+    successMessage = null;
+
+    try
+    {
+      var updateModel = new UserUpdateModel
+      {
+        Id = editUserModel.Id,
+        Name = editUserModel.Name,
+        Email = editUserModel.Email
+      };
+
+      // Only include password if changing it
+      if (changePassword && !string.IsNullOrEmpty(editUserModel.Password))
+      {
+        updateModel.Password = editUserModel.Password;
+      }
+
+      var result = await ProfileService.UpdateUserAsync(updateModel);
+
+      if (result)
+      {
+        await LoadUserData();
+        
+        // Update the current user in auth service
+        if (AuthService.CurrentUser != null)
+        {
+          AuthService.CurrentUser.Name = editUserModel.Name;
+          AuthService.CurrentUser.Email = editUserModel.Email;
+        }
+        
+        successMessage = "Profile updated successfully";
+        isEditMode = false;
+      }
+      else
+      {
+        errorMessage = "Failed to update profile";
+      }
+    }
+    catch (Exception ex)
+    {
+      errorMessage = $"An error occurred: {ex.Message}";
+    }
+
+    isUpdating = false;
+  }
+
+  public class UserEditModel
+  {
+    public string Id { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Name is required")]
+    public string Name { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Email is required")]
+    [EmailAddress(ErrorMessage = "Invalid email format")]
+    public string Email { get; set; } = string.Empty;
+
+    [MinLength(6, ErrorMessage = "Password must be at least 6 characters")]
+    public string? Password { get; set; }
+  }
+}

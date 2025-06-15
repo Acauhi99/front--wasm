@@ -4,7 +4,6 @@
 @using api__dapper.domain.models
 @inject AuthService AuthService
 @inject NavigationManager NavigationManager
-@inject IJSRuntime JSRuntime
 
 <div class="min-h-screen flex items-center justify-center bg-[#11110c] py-12 px-4 sm:px-6 lg:px-8">
   <div class="max-w-md w-full space-y-8 bg-[#1e1e18] p-8 rounded-lg shadow-lg">
@@ -79,7 +78,6 @@
 
       if (result)
       {
-        await JSRuntime.InvokeVoidAsync("alert", "Login successful!");
         NavigationManager.NavigateTo("/");
       }
       else

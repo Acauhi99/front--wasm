@@ -1,9 +1,13 @@
 @using front__wasm.Services
 @inject CartService CartService
 @inject AuthService AuthService
-@inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
 @implements IDisposable
+
+@if (showUserDropdown)
+{
+  <div class="fixed inset-0 z-10" @onclick="CloseDropdowns"></div>
+}
 
 <header class="bg-[#11110c] text-white shadow-lg">
   <div class="container mx-auto px-4 h-20 flex flex-row justify-between items-center">
@@ -37,19 +41,23 @@
 
         @if (isAuthInitialized && AuthService.IsAuthenticated)
         {
-          <li class="relative group">
-            <button class="flex items-center space-x-1 hover:text-[#f1c533] transition">
+          <li class="relative">
+            <button @onclick="ToggleUserDropdown" @onclick:stopPropagation
+              class="flex items-center space-x-1 hover:text-[#f1c533] transition">
               <span>@AuthService.CurrentUser?.Name</span>
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
               </svg>
             </button>
-            <div class="absolute right-0 mt-2 w-48 bg-[#1e1e18] rounded-md shadow-lg py-1 z-10 hidden group-hover:block">
-              <a href="/profile" class="block px-4 py-2 text-sm text-white hover:bg-[#2a2a24]">Profile</a>
-              <button @onclick="HandleLogout"
-                class="block w-full text-left px-4 py-2 text-sm text-white hover:bg-[#2a2a24]">Logout</button>
-            </div>
+            @if (showUserDropdown)
+            {
+              <div @onclick:stopPropagation class="absolute right-0 mt-2 w-48 bg-[#1e1e18] rounded-md shadow-lg py-1 z-20">
+                <a href="/profile" class="block px-4 py-2 text-sm text-white hover:bg-[#2a2a24]">Profile</a>
+                <button @onclick="HandleLogout"
+                  class="block w-full text-left px-4 py-2 text-sm text-white hover:bg-[#2a2a24]">Logout</button>
+              </div>
+            }
           </li>
         }
         else if (isAuthInitialized)
@@ -106,6 +114,7 @@
   private bool isCartInitialized = false;
   private bool isAuthInitialized = false;
   private bool showMobileMenu = false;
+  private bool showUserDropdown = false;
 
   protected override async Task OnInitializedAsync()
   {
@@ -131,8 +140,19 @@
     showMobileMenu = !showMobileMenu;
   }
 
+  private void ToggleUserDropdown()
+  {
+    showUserDropdown = !showUserDropdown;
+  }
+
+  private void CloseDropdowns()
+  {
+    showUserDropdown = false;
+  }
+
   private async Task HandleLogout()
   {
+    showUserDropdown = false;
     await AuthService.LogoutAsync();
     NavigationManager.NavigateTo("/");
   }

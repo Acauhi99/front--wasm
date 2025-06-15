@@ -1,5 +1,6 @@
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.IdentityModel.Tokens.Jwt;
 using api__dapper.domain.models;
 using Microsoft.JSInterop;
 
@@ -9,7 +10,7 @@ namespace front__wasm.Services
   {
     private readonly HttpClient _httpClient;
     private readonly IJSRuntime _jsRuntime;
-    public User? CurrentUser { get; private set; }
+    public User? CurrentUser { get; set; }
     public bool IsAuthenticated => CurrentUser != null;
     public event Action? OnChange;
 
@@ -22,13 +23,20 @@ namespace front__wasm.Services
     public async Task InitializeAsync()
     {
       var token = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "authToken");
-      var userJson = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "user");
 
-      if (!string.IsNullOrEmpty(token) && !string.IsNullOrEmpty(userJson))
+      if (!string.IsNullOrEmpty(token))
       {
         _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-        CurrentUser = JsonSerializer.Deserialize<User>(userJson);
-        NotifyStateChanged();
+
+        // Parse user info from token instead of localStorage
+        CurrentUser = ParseUserFromToken(token);
+
+        if (CurrentUser != null)
+        {
+          // Store updated user info in localStorage
+          await _jsRuntime.InvokeVoidAsync("localStorage.setItem", "user", JsonSerializer.Serialize(CurrentUser));
+          NotifyStateChanged();
+        }
       }
     }
 
@@ -43,23 +51,53 @@ namespace front__wasm.Services
         {
           var authResult = await response.Content.ReadFromJsonAsync<AuthResponse>();
 
-          if (authResult != null)
+          if (authResult != null && !string.IsNullOrEmpty(authResult.Token))
           {
             await _jsRuntime.InvokeVoidAsync("localStorage.setItem", "authToken", authResult.Token);
-            await _jsRuntime.InvokeVoidAsync("localStorage.setItem", "user", JsonSerializer.Serialize(authResult.User));
 
-            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", authResult.Token);
-            CurrentUser = authResult.User;
-            NotifyStateChanged();
-            return true;
+            // Parse user from token
+            CurrentUser = ParseUserFromToken(authResult.Token);
+
+            if (CurrentUser != null)
+            {
+              // Store parsed user info in localStorage
+              await _jsRuntime.InvokeVoidAsync("localStorage.setItem", "user", JsonSerializer.Serialize(CurrentUser));
+              _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", authResult.Token);
+              NotifyStateChanged();
+              return true;
+            }
           }
         }
 
         return false;
       }
-      catch
+      catch (Exception ex)
       {
+        Console.WriteLine($"Login error: {ex.Message}");
         return false;
+      }
+    }
+
+    private User? ParseUserFromToken(string token)
+    {
+      try
+      {
+        var handler = new JwtSecurityTokenHandler();
+        var jwtToken = handler.ReadJwtToken(token);
+
+        return new User
+        {
+          Id = jwtToken.Claims.FirstOrDefault(c => c.Type == "nameid")?.Value ?? string.Empty,
+          Name = jwtToken.Claims.FirstOrDefault(c => c.Type == "unique_name")?.Value ?? string.Empty,
+          Email = jwtToken.Claims.FirstOrDefault(c => c.Type == "email")?.Value ?? string.Empty,
+          Role = jwtToken.Claims.FirstOrDefault(c => c.Type == "role")?.Value ?? "User",
+          CreatedAt = DateTime.Now // Not available in token, using current time as fallback
+        };
+      }
+      catch (Exception ex)
+      {
+        Console.WriteLine($"Error parsing token: {ex.Message}");
+        return null;
       }
     }
 
@@ -83,6 +121,18 @@ namespace front__wasm.Services
       _httpClient.DefaultRequestHeaders.Authorization = null;
       CurrentUser = null;
       NotifyStateChanged();
+    }
+
+    public async Task<string> GetTokenAsync()
+    {
+      try
+      {
+        return await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "authToken");
+      }
+      catch
+      {
+        return string.Empty;
+      }
     }
 
     private void NotifyStateChanged() => OnChange?.Invoke();
