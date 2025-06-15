@@ -1,0 +1,160 @@
+@page "/client-dashboard"
+
+<div class="container mx-auto px-4 py-10">
+    <h1 class="text-3xl font-bold mb-8 text-center text-white">Minha Conta</h1>
+
+    <div class="bg-[#1e1e18] rounded-lg shadow-lg p-6 mb-8">
+        <h2 class="text-xl font-semibold text-white mb-4">Filtrar por data e serviço</h2>
+        <div class="flex flex-col md:flex-row gap-4 mb-4">
+            <input type="date" class="px-3 py-2 rounded bg-[#2a2a24] text-white" @bind="startDate" />
+            <span class="text-white self-center">até</span>
+            <input type="date" class="px-3 py-2 rounded bg-[#2a2a24] text-white" @bind="endDate" />
+            <input type="text" class="px-3 py-2 rounded bg-[#2a2a24] text-white" placeholder="Buscar serviço..." @bind="searchTerm" />
+            <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded" @onclick="ApplyFilter">Filtrar</button>
+        </div>
+    </div>
+
+    <div class="bg-[#1e1e18] rounded-lg shadow-lg p-6">
+        <h2 class="text-xl font-semibold text-white mb-4">Histórico de Compras</h2>
+        @if (filteredOrders.Count == 0)
+        {
+            <p class="text-gray-400">Nenhuma compra encontrada nesse período.</p>
+        }
+        else
+        {
+            <table class="min-w-full text-white">
+                <thead>
+                    <tr>
+                        <th class="py-2 px-4 cursor-pointer select-none" @onclick="() => SortBy(nameof(OrderMock.Date))">
+                            Data
+                            <span>
+                                @if (sortColumn == nameof(OrderMock.Date))
+                                {
+                                    @if (sortAscending)
+                                    {
+                                        <span>&uarr;</span>
+                                    }
+                                    else
+                                    {
+                                        <span>&darr;</span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="opacity-50">&uarr;&darr;</span>
+                                }
+                            </span>
+                        </th>
+                        <th class="py-2 px-4">Serviço</th>
+                        <th class="py-2 px-4 cursor-pointer select-none" @onclick="() => SortBy(nameof(OrderMock.Price))">
+                            Valor
+                            <span>
+                                @if (sortColumn == nameof(OrderMock.Price))
+                                {
+                                    @if (sortAscending)
+                                    {
+                                        <span>&uarr;</span>
+                                    }
+                                    else
+                                    {
+                                        <span>&darr;</span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="opacity-50">&uarr;&darr;</span>
+                                }
+                            </span>
+                        </th>
+                        <th class="py-2 px-4">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in filteredOrders)
+                    {
+                        <tr class="border-b border-gray-700">
+                            <td class="py-2 px-4">@order.Date.ToString("dd/MM/yyyy")</td>
+                            <td class="py-2 px-4">@order.ServiceName</td>
+                            <td class="py-2 px-4">R$ @order.Price.ToString("F2")</td>
+                            <td class="py-2 px-4">
+                                <div class="flex justify-center">
+                                    <button class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded">
+                                        Comprar novamente
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+
+@code {
+    private DateTime? startDate;
+    private DateTime? endDate;
+    private string searchTerm = string.Empty;
+    private List<OrderMock> allOrders = new()
+    {
+        new OrderMock { Date = DateTime.Today.AddDays(-1), ServiceName = "Ouro 100k", Price = 25.00m },
+        new OrderMock { Date = DateTime.Today.AddDays(-10), ServiceName = "Boost Dungeon", Price = 50.00m },
+        new OrderMock { Date = DateTime.Today.AddDays(-20), ServiceName = "Raid Heroica", Price = 120.00m }
+    };
+    private List<OrderMock> filteredOrders = new();
+
+    private string sortColumn = nameof(OrderMock.Date);
+    private bool sortAscending = false;
+
+    protected override void OnInitialized()
+    {
+        ApplyFilter();
+    }
+
+    private void ApplyFilter()
+    {
+        IEnumerable<OrderMock> query = allOrders
+            .Where(o =>
+                (!startDate.HasValue || o.Date >= startDate.Value) &&
+                (!endDate.HasValue || o.Date <= endDate.Value) &&
+                (string.IsNullOrWhiteSpace(searchTerm) || o.ServiceName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+            );
+
+        filteredOrders = SortOrders(query.ToList());
+    }
+
+    private void SortBy(string column)
+    {
+        if (sortColumn == column)
+        {
+            sortAscending = !sortAscending;
+        }
+        else
+        {
+            sortColumn = column;
+            sortAscending = true;
+        }
+        filteredOrders = SortOrders(filteredOrders);
+    }
+
+    private List<OrderMock> SortOrders(List<OrderMock> orders)
+    {
+        return sortColumn switch
+        {
+            nameof(OrderMock.Date) => sortAscending
+                ? orders.OrderBy(o => o.Date).ToList()
+                : orders.OrderByDescending(o => o.Date).ToList(),
+            nameof(OrderMock.Price) => sortAscending
+                ? orders.OrderBy(o => o.Price).ToList()
+                : orders.OrderByDescending(o => o.Price).ToList(),
+            _ => orders
+        };
+    }
+
+    public class OrderMock
+    {
+        public DateTime Date { get; set; }
+        public string ServiceName { get; set; } = "";
+        public decimal Price { get; set; }
+    }
+}
