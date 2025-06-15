@@ -4,13 +4,19 @@
     <h1 class="text-3xl font-bold mb-8 text-center text-white">Minha Conta</h1>
 
     <div class="bg-[#1e1e18] rounded-lg shadow-lg p-6 mb-8">
-        <h2 class="text-xl font-semibold text-white mb-4">Filtrar por data e serviço</h2>
+        <h2 class="text-xl font-semibold text-white mb-4">Filtrar por data, código, serviço</h2>
         <div class="flex flex-col md:flex-row gap-4 mb-4">
-            <input type="date" class="px-3 py-2 rounded bg-[#2a2a24] text-white" @bind="startDate" />
+            <input type="date" class="px-3 py-2 rounded bg-[#2a2a24] text-white"
+                   @bind="startDate" />
             <span class="text-white self-center">até</span>
-            <input type="date" class="px-3 py-2 rounded bg-[#2a2a24] text-white" @bind="endDate" />
-            <input type="text" class="px-3 py-2 rounded bg-[#2a2a24] text-white" placeholder="Buscar serviço..." @bind="searchTerm" />
-            <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded" @onclick="ApplyFilter">Filtrar</button>
+            <input type="date" class="px-3 py-2 rounded bg-[#2a2a24] text-white"
+                   @bind="endDate" />
+            <input type="text" class="px-3 py-2 rounded bg-[#2a2a24] text-white"
+                   placeholder="Buscar código..."
+                   @bind-value="searchOrderCode" @bind-value:event="oninput" />
+            <input type="text" class="px-3 py-2 rounded bg-[#2a2a24] text-white"
+                   placeholder="Buscar serviço..."
+                   @bind-value="searchService" @bind-value:event="oninput" />
         </div>
     </div>
 
@@ -25,44 +31,53 @@
             <table class="min-w-full text-white">
                 <thead>
                     <tr>
-                        <th class="py-2 px-4 cursor-pointer select-none" @onclick="() => SortBy(nameof(OrderMock.Date))">
-                            Data
-                            <span>
-                                @if (sortColumn == nameof(OrderMock.Date))
-                                {
-                                    @if (sortAscending)
-                                    {
-                                        <span>&uarr;</span>
-                                    }
-                                    else
-                                    {
-                                        <span>&darr;</span>
-                                    }
-                                }
-                                else
-                                {
-                                    <span class="opacity-50">&uarr;&darr;</span>
-                                }
-                            </span>
-                        </th>
+                        <th class="py-2 px-4">Código</th>
                         <th class="py-2 px-4">Serviço</th>
-                        <th class="py-2 px-4 cursor-pointer select-none" @onclick="() => SortBy(nameof(OrderMock.Price))">
+                        <th class="py-2 px-4 cursor-pointer select-none" @onclick="() => CycleSort(nameof(OrderMock.Price))">
                             Valor
                             <span>
                                 @if (sortColumn == nameof(OrderMock.Price))
                                 {
-                                    @if (sortAscending)
+                                    @if (sortDirection == SortDirection.Ascending)
                                     {
-                                        <span>&uarr;</span>
+                                        <span title="Ordenar crescente" class="ml-1 text-xs align-middle">&#8593;</span>
+                                    }
+                                    else if (sortDirection == SortDirection.Descending)
+                                    {
+                                        <span title="Ordenar decrescente" class="ml-1 text-xs align-middle">&#8595;</span>
                                     }
                                     else
                                     {
-                                        <span>&darr;</span>
+                                        <span title="Sem ordenação" class="ml-1 text-xs align-middle">&#8722;</span>
                                     }
                                 }
                                 else
                                 {
-                                    <span class="opacity-50">&uarr;&darr;</span>
+                                    <span class="opacity-50 ml-1 text-xs align-middle" title="Sem ordenação">&#8722;</span>
+                                }
+                            </span>
+                        </th>
+                        <th class="py-2 px-4 cursor-pointer select-none" @onclick="() => CycleSort(nameof(OrderMock.Date))">
+                            Data
+                            <span>
+                                @if (sortColumn == nameof(OrderMock.Date))
+                                {
+                                    @if (sortDirection == SortDirection.Ascending)
+                                    {
+                                        <span title="Ordenar crescente" class="ml-1 text-xs align-middle">&#8593;</span>
+                                    }
+                                    else if (sortDirection == SortDirection.Descending)
+                                    {
+                                        <span title="Ordenar decrescente" class="ml-1 text-xs align-middle">&#8595;</span>
+                                    }
+                                    else
+                                    {
+                                        <span title="Sem ordenação" class="ml-1 text-xs align-middle">&#8722;</span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="opacity-50 ml-1 text-xs align-middle" title="Sem ordenação">&#8722;</span>
                                 }
                             </span>
                         </th>
@@ -73,14 +88,13 @@
                     @foreach (var order in filteredOrders)
                     {
                         <tr class="border-b border-gray-700">
-                            <td class="py-2 px-4">@order.Date.ToString("dd/MM/yyyy")</td>
+                            <td class="py-2 px-4">@order.OrderCode</td>
                             <td class="py-2 px-4">@order.ServiceName</td>
                             <td class="py-2 px-4">R$ @order.Price.ToString("F2")</td>
+                            <td class="py-2 px-4">@order.Date.ToString("dd/MM/yyyy")</td>
                             <td class="py-2 px-4">
                                 <div class="flex justify-center">
-                                    <button class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded">
-                                        Comprar novamente
-                                    </button>
+                                    <button class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded">Comprar novamente</button>
                                 </div>
                             </td>
                         </tr>
@@ -92,19 +106,70 @@
 </div>
 
 @code {
-    private DateTime? startDate;
-    private DateTime? endDate;
-    private string searchTerm = string.Empty;
+    private DateTime? _startDate;
+    private DateTime? _endDate;
+    private string _searchService = string.Empty;
+    private string _searchOrderCode = string.Empty;
+
+    private DateTime? startDate
+    {
+        get => _startDate;
+        set
+        {
+            if (_startDate != value)
+            {
+                _startDate = value;
+                ApplyFilter();
+            }
+        }
+    }
+    private DateTime? endDate
+    {
+        get => _endDate;
+        set
+        {
+            if (_endDate != value)
+            {
+                _endDate = value;
+                ApplyFilter();
+            }
+        }
+    }
+    private string searchService
+    {
+        get => _searchService;
+        set
+        {
+            if (_searchService != value)
+            {
+                _searchService = value;
+                ApplyFilter();
+            }
+        }
+    }
+    private string searchOrderCode
+    {
+        get => _searchOrderCode;
+        set
+        {
+            if (_searchOrderCode != value)
+            {
+                _searchOrderCode = value;
+                ApplyFilter();
+            }
+        }
+    }
+
     private List<OrderMock> allOrders = new()
     {
-        new OrderMock { Date = DateTime.Today.AddDays(-1), ServiceName = "Ouro 100k", Price = 25.00m },
-        new OrderMock { Date = DateTime.Today.AddDays(-10), ServiceName = "Boost Dungeon", Price = 50.00m },
-        new OrderMock { Date = DateTime.Today.AddDays(-20), ServiceName = "Raid Heroica", Price = 120.00m }
+        new OrderMock { OrderCode = "A123", ServiceName = "Ouro 100k", Price = 25.00m, Date = DateTime.Today.AddDays(-1) },
+        new OrderMock { OrderCode = "B456", ServiceName = "Boost Dungeon", Price = 50.00m, Date = DateTime.Today.AddDays(-10) },
+        new OrderMock { OrderCode = "C789", ServiceName = "Raid Heroica", Price = 120.00m, Date = DateTime.Today.AddDays(-20) }
     };
     private List<OrderMock> filteredOrders = new();
 
-    private string sortColumn = nameof(OrderMock.Date);
-    private bool sortAscending = false;
+    private string? sortColumn = null;
+    private SortDirection sortDirection = SortDirection.None;
 
     protected override void OnInitialized()
     {
@@ -117,34 +182,44 @@
             .Where(o =>
                 (!startDate.HasValue || o.Date >= startDate.Value) &&
                 (!endDate.HasValue || o.Date <= endDate.Value) &&
-                (string.IsNullOrWhiteSpace(searchTerm) || o.ServiceName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                (string.IsNullOrWhiteSpace(searchService) || o.ServiceName.Contains(searchService, StringComparison.OrdinalIgnoreCase)) &&
+                (string.IsNullOrWhiteSpace(searchOrderCode) || o.OrderCode.Contains(searchOrderCode, StringComparison.OrdinalIgnoreCase))
             );
 
         filteredOrders = SortOrders(query.ToList());
     }
 
-    private void SortBy(string column)
+    private void CycleSort(string column)
     {
-        if (sortColumn == column)
+        if (sortColumn != column)
         {
-            sortAscending = !sortAscending;
+            sortColumn = column;
+            sortDirection = SortDirection.Ascending;
         }
         else
         {
-            sortColumn = column;
-            sortAscending = true;
+            sortDirection = sortDirection switch
+            {
+                SortDirection.None => SortDirection.Ascending,
+                SortDirection.Ascending => SortDirection.Descending,
+                SortDirection.Descending => SortDirection.None,
+                _ => SortDirection.None
+            };
         }
         filteredOrders = SortOrders(filteredOrders);
     }
 
     private List<OrderMock> SortOrders(List<OrderMock> orders)
     {
+        if (sortDirection == SortDirection.None || string.IsNullOrEmpty(sortColumn))
+            return orders;
+
         return sortColumn switch
         {
-            nameof(OrderMock.Date) => sortAscending
+            nameof(OrderMock.Date) => sortDirection == SortDirection.Ascending
                 ? orders.OrderBy(o => o.Date).ToList()
                 : orders.OrderByDescending(o => o.Date).ToList(),
-            nameof(OrderMock.Price) => sortAscending
+            nameof(OrderMock.Price) => sortDirection == SortDirection.Ascending
                 ? orders.OrderBy(o => o.Price).ToList()
                 : orders.OrderByDescending(o => o.Price).ToList(),
             _ => orders
@@ -153,8 +228,16 @@
 
     public class OrderMock
     {
-        public DateTime Date { get; set; }
+        public string OrderCode { get; set; } = "";
         public string ServiceName { get; set; } = "";
         public decimal Price { get; set; }
+        public DateTime Date { get; set; }
+    }
+
+    public enum SortDirection
+    {
+        None,
+        Ascending,
+        Descending
     }
 }
