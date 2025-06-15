@@ -1,0 +1,287 @@
+@page "/admin-dashboard"
+
+@using System.Globalization
+
+<div class="container mx-auto px-4 py-10">
+    <h1 class="text-3xl font-bold mb-8 text-center text-white">Painel do Administrador</h1>
+
+    <div class="flex flex-col md:flex-row justify-center gap-8 mb-8">
+        <div class="bg-[#23231c] rounded-lg shadow-md p-6 flex-1 text-center">
+            <div class="text-lg text-gray-300 mb-2">Pedidos em @currentMonthName/@currentYear</div>
+            <div class="text-4xl font-bold text-white">@ordersThisMonth</div>
+        </div>
+        <div class="bg-[#23231c] rounded-lg shadow-md p-6 flex-1 text-center">
+            <div class="text-lg text-gray-300 mb-2">Total ganho em @currentMonthName/@currentYear</div>
+            <div class="text-4xl font-bold text-green-400">R$ @totalThisMonth.ToString("F2")</div>
+        </div>
+    </div>
+
+    <div class="bg-[#1e1e18] rounded-lg shadow-lg p-6 mb-8">
+        <h2 class="text-xl font-semibold text-white mb-4">Filtrar por data, código, cliente e serviço</h2>
+        <div class="flex flex-col md:flex-row gap-4 mb-4">
+            <input type="date" class="px-3 py-2 rounded bg-[#2a2a24] text-white"
+                   @bind="startDate" />
+            <span class="text-white self-center">até</span>
+            <input type="date" class="px-3 py-2 rounded bg-[#2a2a24] text-white"
+                   @bind="endDate" />
+            <input type="text" class="px-3 py-2 rounded bg-[#2a2a24] text-white"
+                   placeholder="Buscar código..."
+                   @bind-value="searchOrderCode" @bind-value:event="oninput" />
+            <input type="text" class="px-3 py-2 rounded bg-[#2a2a24] text-white"
+                   placeholder="Buscar cliente..."
+                   @bind-value="searchClient" @bind-value:event="oninput" />
+            <input type="text" class="px-3 py-2 rounded bg-[#2a2a24] text-white"
+                   placeholder="Buscar serviço..."
+                   @bind-value="searchService" @bind-value:event="oninput" />
+        </div>
+    </div>
+
+    <div class="bg-[#1e1e18] rounded-lg shadow-lg p-6">
+        <h2 class="text-xl font-semibold text-white mb-4">Pedidos Recentes</h2>
+        @if (filteredOrders.Count == 0)
+        {
+            <p class="text-gray-400">Nenhum pedido encontrado nesse período.</p>
+        }
+        else
+        {
+            <table class="min-w-full text-white">
+                <thead>
+                    <tr>
+                        <th class="py-2 px-4">Código</th>
+                        <th class="py-2 px-4">Cliente</th>
+                        <th class="py-2 px-4">Serviço</th>
+                        <th class="py-2 px-4 cursor-pointer select-none" @onclick="() => CycleSort(nameof(AdminOrderMock.Price))">
+                            Valor
+                            <span>
+                                @if (sortColumn == nameof(AdminOrderMock.Price))
+                                {
+                                    @if (sortDirection == SortDirection.Ascending)
+                                    {
+                                        <span title="Ordenar crescente" class="ml-1 text-xs align-middle">&#8593;</span> <!-- ↑ -->
+                                    }
+                                    else if (sortDirection == SortDirection.Descending)
+                                    {
+                                        <span title="Ordenar decrescente" class="ml-1 text-xs align-middle">&#8595;</span> <!-- ↓ -->
+                                    }
+                                    else
+                                    {
+                                        <span title="Sem ordenação" class="ml-1 text-xs align-middle">&#8722;</span> <!-- − -->
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="opacity-50 ml-1 text-xs align-middle" title="Sem ordenação">&#8722;</span>
+                                }
+                            </span>
+                        </th>
+                        <th class="py-2 px-4 cursor-pointer select-none" @onclick="() => CycleSort(nameof(AdminOrderMock.Date))">
+                            Data
+                            <span>
+                                @if (sortColumn == nameof(AdminOrderMock.Date))
+                                {
+                                    @if (sortDirection == SortDirection.Ascending)
+                                    {
+                                        <span title="Ordenar crescente" class="ml-1 text-xs align-middle">&#8593;</span>
+                                    }
+                                    else if (sortDirection == SortDirection.Descending)
+                                    {
+                                        <span title="Ordenar decrescente" class="ml-1 text-xs align-middle">&#8595;</span>
+                                    }
+                                    else
+                                    {
+                                        <span title="Sem ordenação" class="ml-1 text-xs align-middle">&#8722;</span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="opacity-50 ml-1 text-xs align-middle" title="Sem ordenação">&#8722;</span>
+                                }
+                            </span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in filteredOrders)
+                    {
+                        <tr class="border-b border-gray-700">
+                            <td class="py-2 px-4">@order.OrderCode</td>
+                            <td class="py-2 px-4">@order.ClientName</td>
+                            <td class="py-2 px-4">@order.ServiceName</td>
+                            <td class="py-2 px-4">R$ @order.Price.ToString("F2")</td>
+                            <td class="py-2 px-4">@order.Date.ToString("dd/MM/yyyy")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+
+@code {
+    private DateTime? _startDate;
+    private DateTime? _endDate;
+    private string _searchService = string.Empty;
+    private string _searchClient = string.Empty;
+    private string _searchOrderCode = string.Empty;
+
+    private DateTime? startDate
+    {
+        get => _startDate;
+        set
+        {
+            if (_startDate != value)
+            {
+                _startDate = value;
+                ApplyFilter();
+            }
+        }
+    }
+    private DateTime? endDate
+    {
+        get => _endDate;
+        set
+        {
+            if (_endDate != value)
+            {
+                _endDate = value;
+                ApplyFilter();
+            }
+        }
+    }
+    private string searchService
+    {
+        get => _searchService;
+        set
+        {
+            if (_searchService != value)
+            {
+                _searchService = value;
+                ApplyFilter();
+            }
+        }
+    }
+    private string searchClient
+    {
+        get => _searchClient;
+        set
+        {
+            if (_searchClient != value)
+            {
+                _searchClient = value;
+                ApplyFilter();
+            }
+        }
+    }
+    private string searchOrderCode
+    {
+        get => _searchOrderCode;
+        set
+        {
+            if (_searchOrderCode != value)
+            {
+                _searchOrderCode = value;
+                ApplyFilter();
+            }
+        }
+    }
+
+    private List<AdminOrderMock> allOrders = new()
+    {
+        new AdminOrderMock { OrderCode = "A123", ClientName = "João Silva", ServiceName = "Ouro 100k", Price = 25.00m, Date = DateTime.Today.AddDays(-1) },
+        new AdminOrderMock { OrderCode = "B456", ClientName = "Maria Souza", ServiceName = "Boost Dungeon", Price = 50.00m, Date = DateTime.Today.AddDays(-10) },
+        new AdminOrderMock { OrderCode = "C789", ClientName = "Carlos Lima", ServiceName = "Raid Heroica", Price = 120.00m, Date = DateTime.Today.AddDays(-20) }
+    };
+    private List<AdminOrderMock> filteredOrders = new();
+
+    private string? sortColumn = null;
+    private SortDirection sortDirection = SortDirection.None;
+
+    private int ordersThisMonth = 0;
+    private decimal totalThisMonth = 0;
+    private string currentMonthName = "";
+    private int currentYear = DateTime.Now.Year;
+
+    protected override void OnInitialized()
+    {
+        var now = DateTime.Now;
+        currentMonthName = CultureInfo.GetCultureInfo("pt-BR").DateTimeFormat.GetMonthName(now.Month);
+        currentMonthName = char.ToUpper(currentMonthName[0]) + currentMonthName.Substring(1); // Primeira letra maiúscula
+        ApplyFilter();
+    }
+
+    private void ApplyFilter()
+    {
+        IEnumerable<AdminOrderMock> query = allOrders
+            .Where(o =>
+                (!startDate.HasValue || o.Date >= startDate.Value) &&
+                (!endDate.HasValue || o.Date <= endDate.Value) &&
+                (string.IsNullOrWhiteSpace(searchService) || o.ServiceName.Contains(searchService, StringComparison.OrdinalIgnoreCase)) &&
+                (string.IsNullOrWhiteSpace(searchClient) || o.ClientName.Contains(searchClient, StringComparison.OrdinalIgnoreCase)) &&
+                (string.IsNullOrWhiteSpace(searchOrderCode) || o.OrderCode.Contains(searchOrderCode, StringComparison.OrdinalIgnoreCase))
+            );
+
+        filteredOrders = SortOrders(query.ToList());
+        CalculateMonthDashboard();
+    }
+
+    private void CalculateMonthDashboard()
+    {
+        var now = DateTime.Now;
+        var orders = allOrders.Where(o => o.Date.Month == now.Month && o.Date.Year == now.Year);
+        ordersThisMonth = orders.Count();
+        totalThisMonth = orders.Sum(o => o.Price);
+    }
+
+    private void CycleSort(string column)
+    {
+        if (sortColumn != column)
+        {
+            sortColumn = column;
+            sortDirection = SortDirection.Ascending;
+        }
+        else
+        {
+            sortDirection = sortDirection switch
+            {
+                SortDirection.None => SortDirection.Ascending,
+                SortDirection.Ascending => SortDirection.Descending,
+                SortDirection.Descending => SortDirection.None,
+                _ => SortDirection.None
+            };
+        }
+        filteredOrders = SortOrders(filteredOrders);
+    }
+
+    private List<AdminOrderMock> SortOrders(List<AdminOrderMock> orders)
+    {
+        if (sortDirection == SortDirection.None || string.IsNullOrEmpty(sortColumn))
+            return orders;
+
+        return sortColumn switch
+        {
+            nameof(AdminOrderMock.Date) => sortDirection == SortDirection.Ascending
+                ? orders.OrderBy(o => o.Date).ToList()
+                : orders.OrderByDescending(o => o.Date).ToList(),
+            nameof(AdminOrderMock.Price) => sortDirection == SortDirection.Ascending
+                ? orders.OrderBy(o => o.Price).ToList()
+                : orders.OrderByDescending(o => o.Price).ToList(),
+            _ => orders
+        };
+    }
+
+    public class AdminOrderMock
+    {
+        public string OrderCode { get; set; } = "";
+        public string ClientName { get; set; } = "";
+        public string ServiceName { get; set; } = "";
+        public decimal Price { get; set; }
+        public DateTime Date { get; set; }
+    }
+
+    public enum SortDirection
+    {
+        None,
+        Ascending,
+        Descending
+    }
+}
