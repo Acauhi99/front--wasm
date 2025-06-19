@@ -41,6 +41,14 @@
 
         @if (isAuthInitialized && AuthService.IsAuthenticated)
         {
+          @if (AuthService.CurrentUser?.Role == "Admin")
+          {
+            <li><a href="/admin-dashboard" class="hover:text-[#f1c533] transition">Dashboard</a></li>
+          }
+          else
+          {
+            <li><a href="/client-dashboard" class="hover:text-[#f1c533] transition">Minha Conta</a></li>
+          }
           <li class="relative">
             <button @onclick="ToggleUserDropdown" @onclick:stopPropagation
               class="flex items-center space-x-1 hover:text-[#f1c533] transition">

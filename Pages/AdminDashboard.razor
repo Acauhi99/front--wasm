@@ -47,10 +47,10 @@
             <table class="min-w-full text-white">
                 <thead>
                     <tr>
-                        <th class="py-2 px-4">Código</th>
-                        <th class="py-2 px-4">Cliente</th>
-                        <th class="py-2 px-4">Serviço</th>
-                        <th class="py-2 px-4 cursor-pointer select-none" @onclick="() => CycleSort(nameof(AdminOrderMock.Price))">
+                        <th class="py-2 px-4 text-left">Código</th>
+                        <th class="py-2 px-4 text-left">Cliente</th>
+                        <th class="py-2 px-4 text-left">Serviço</th>
+                        <th class="py-2 px-4 text-right cursor-pointer select-none" @onclick="() => CycleSort(nameof(AdminOrderMock.Price))">
                             Valor
                             <span>
                                 @if (sortColumn == nameof(AdminOrderMock.Price))
@@ -74,7 +74,7 @@
                                 }
                             </span>
                         </th>
-                        <th class="py-2 px-4 cursor-pointer select-none" @onclick="() => CycleSort(nameof(AdminOrderMock.Date))">
+                        <th class="py-2 px-4 text-right cursor-pointer select-none" @onclick="() => CycleSort(nameof(AdminOrderMock.Date))">
                             Data
                             <span>
                                 @if (sortColumn == nameof(AdminOrderMock.Date))
@@ -107,8 +107,8 @@
                             <td class="py-2 px-4">@order.OrderCode</td>
                             <td class="py-2 px-4">@order.ClientName</td>
                             <td class="py-2 px-4">@order.ServiceName</td>
-                            <td class="py-2 px-4">R$ @order.Price.ToString("F2")</td>
-                            <td class="py-2 px-4">@order.Date.ToString("dd/MM/yyyy")</td>
+                            <td class="py-2 px-4 text-right">R$ @order.Price.ToString("F2")</td>
+                            <td class="py-2 px-4 text-right">@order.Date.ToString("dd/MM/yyyy")</td>
                         </tr>
                     }
                 </tbody>

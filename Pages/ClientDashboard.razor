@@ -6,17 +6,13 @@
     <div class="bg-[#1e1e18] rounded-lg shadow-lg p-6 mb-8">
         <h2 class="text-xl font-semibold text-white mb-4">Filtrar por data, código, serviço</h2>
         <div class="flex flex-col md:flex-row gap-4 mb-4">
-            <input type="date" class="px-3 py-2 rounded bg-[#2a2a24] text-white"
-                   @bind="startDate" />
+            <input type="date" class="px-3 py-2 rounded bg-[#2a2a24] text-white" @bind="startDate" />
             <span class="text-white self-center">até</span>
-            <input type="date" class="px-3 py-2 rounded bg-[#2a2a24] text-white"
-                   @bind="endDate" />
-            <input type="text" class="px-3 py-2 rounded bg-[#2a2a24] text-white"
-                   placeholder="Buscar código..."
-                   @bind-value="searchOrderCode" @bind-value:event="oninput" />
-            <input type="text" class="px-3 py-2 rounded bg-[#2a2a24] text-white"
-                   placeholder="Buscar serviço..."
-                   @bind-value="searchService" @bind-value:event="oninput" />
+            <input type="date" class="px-3 py-2 rounded bg-[#2a2a24] text-white" @bind="endDate" />
+            <input type="text" class="px-3 py-2 rounded bg-[#2a2a24] text-white" placeholder="Buscar código..."
+                @bind-value="searchOrderCode" @bind-value:event="oninput" />
+            <input type="text" class="px-3 py-2 rounded bg-[#2a2a24] text-white" placeholder="Buscar serviço..."
+                @bind-value="searchService" @bind-value:event="oninput" />
         </div>
     </div>
 
@@ -31,9 +27,10 @@
             <table class="min-w-full text-white">
                 <thead>
                     <tr>
-                        <th class="py-2 px-4">Código</th>
-                        <th class="py-2 px-4">Serviço</th>
-                        <th class="py-2 px-4 cursor-pointer select-none" @onclick="() => CycleSort(nameof(OrderMock.Price))">
+                        <th class="py-2 px-4 text-left">Código</th>
+                        <th class="py-2 px-4 text-left">Serviço</th>
+                        <th class="py-2 px-4 text-right cursor-pointer select-none"
+                            @onclick="() => CycleSort(nameof(OrderMock.Price))">
                             Valor
                             <span>
                                 @if (sortColumn == nameof(OrderMock.Price))
@@ -57,7 +54,8 @@
                                 }
                             </span>
                         </th>
-                        <th class="py-2 px-4 cursor-pointer select-none" @onclick="() => CycleSort(nameof(OrderMock.Date))">
+                        <th class="py-2 px-4 text-right cursor-pointer select-none"
+                            @onclick="() => CycleSort(nameof(OrderMock.Date))">
                             Data
                             <span>
                                 @if (sortColumn == nameof(OrderMock.Date))
@@ -81,7 +79,7 @@
                                 }
                             </span>
                         </th>
-                        <th class="py-2 px-4">Ações</th>
+                        <th class="py-2 px-4 text-center">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -90,11 +88,12 @@
                         <tr class="border-b border-gray-700">
                             <td class="py-2 px-4">@order.OrderCode</td>
                             <td class="py-2 px-4">@order.ServiceName</td>
-                            <td class="py-2 px-4">R$ @order.Price.ToString("F2")</td>
-                            <td class="py-2 px-4">@order.Date.ToString("dd/MM/yyyy")</td>
+                            <td class="py-2 px-4 text-right">R$ @order.Price.ToString("F2")</td>
+                            <td class="py-2 px-4 text-right">@order.Date.ToString("dd/MM/yyyy")</td>
                             <td class="py-2 px-4">
                                 <div class="flex justify-center">
-                                    <button class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded">Comprar novamente</button>
+                                    <button class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded">Comprar
+                                        novamente</button>
                                 </div>
                             </td>
                         </tr>
@@ -161,11 +160,11 @@
     }
 
     private List<OrderMock> allOrders = new()
-    {
-        new OrderMock { OrderCode = "A123", ServiceName = "Ouro 100k", Price = 25.00m, Date = DateTime.Today.AddDays(-1) },
-        new OrderMock { OrderCode = "B456", ServiceName = "Boost Dungeon", Price = 50.00m, Date = DateTime.Today.AddDays(-10) },
-        new OrderMock { OrderCode = "C789", ServiceName = "Raid Heroica", Price = 120.00m, Date = DateTime.Today.AddDays(-20) }
-    };
+{
+new OrderMock { OrderCode = "A123", ServiceName = "Ouro 100k", Price = 25.00m, Date = DateTime.Today.AddDays(-1) },
+new OrderMock { OrderCode = "B456", ServiceName = "Boost Dungeon", Price = 50.00m, Date = DateTime.Today.AddDays(-10) },
+new OrderMock { OrderCode = "C789", ServiceName = "Raid Heroica", Price = 120.00m, Date = DateTime.Today.AddDays(-20) }
+};
     private List<OrderMock> filteredOrders = new();
 
     private string? sortColumn = null;
@@ -179,12 +178,14 @@
     private void ApplyFilter()
     {
         IEnumerable<OrderMock> query = allOrders
-            .Where(o =>
-                (!startDate.HasValue || o.Date >= startDate.Value) &&
-                (!endDate.HasValue || o.Date <= endDate.Value) &&
-                (string.IsNullOrWhiteSpace(searchService) || o.ServiceName.Contains(searchService, StringComparison.OrdinalIgnoreCase)) &&
-                (string.IsNullOrWhiteSpace(searchOrderCode) || o.OrderCode.Contains(searchOrderCode, StringComparison.OrdinalIgnoreCase))
-            );
+        .Where(o =>
+        (!startDate.HasValue || o.Date >= startDate.Value) &&
+        (!endDate.HasValue || o.Date <= endDate.Value) &&
+        (string.IsNullOrWhiteSpace(searchService) || o.ServiceName.Contains(searchService, StringComparison.OrdinalIgnoreCase))
+        &&
+        (string.IsNullOrWhiteSpace(searchOrderCode) || o.OrderCode.Contains(searchOrderCode,
+        StringComparison.OrdinalIgnoreCase))
+        );
 
         filteredOrders = SortOrders(query.ToList());
     }
@@ -217,11 +218,11 @@
         return sortColumn switch
         {
             nameof(OrderMock.Date) => sortDirection == SortDirection.Ascending
-                ? orders.OrderBy(o => o.Date).ToList()
-                : orders.OrderByDescending(o => o.Date).ToList(),
+            ? orders.OrderBy(o => o.Date).ToList()
+            : orders.OrderByDescending(o => o.Date).ToList(),
             nameof(OrderMock.Price) => sortDirection == SortDirection.Ascending
-                ? orders.OrderBy(o => o.Price).ToList()
-                : orders.OrderByDescending(o => o.Price).ToList(),
+            ? orders.OrderBy(o => o.Price).ToList()
+            : orders.OrderByDescending(o => o.Price).ToList(),
             _ => orders
         };
     }
