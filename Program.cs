@@ -18,7 +18,6 @@ builder.Services.AddHttpClient("ApiClient", client =>
 });
 
 // Register services
-builder.Services.AddScoped<ServiceManager>();
 builder.Services.AddScoped<CartService>();
 
 // Register AuthService 
@@ -37,6 +36,15 @@ builder.Services.AddScoped(sp =>
   var httpClient = httpClientFactory.CreateClient("ApiClient");
   var authService = sp.GetRequiredService<AuthService>();
   return new ProfileService(httpClient, authService);
+});
+
+// Register ServiceManager 
+builder.Services.AddScoped(sp =>
+{
+  var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
+  var httpClient = httpClientFactory.CreateClient("ApiClient");
+  var logger = sp.GetService<ILogger<ServiceManager>>();
+  return new ServiceManager(httpClient, logger);
 });
 
 builder.Logging.SetMinimumLevel(LogLevel.Debug);

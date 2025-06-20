@@ -7,7 +7,7 @@ namespace front__wasm.Services
   {
     private readonly HttpClient _httpClient;
     private readonly ILogger<ServiceManager>? _logger;
-    private Dictionary<string, Service>? _cachedServices;
+    private List<Service>? _cachedServices;
 
     public ServiceManager(HttpClient httpClient, ILogger<ServiceManager>? logger = null)
     {
@@ -16,49 +16,77 @@ namespace front__wasm.Services
     }
 
     // Carrega todos os serviços da API
-    public async Task<Dictionary<string, Service>> GetAllServicesAsync()
+    public async Task<List<Service>> GetAllServicesAsync()
     {
       if (_cachedServices != null)
         return _cachedServices;
 
       try
       {
-        _logger?.LogInformation("Attempting to load services from json file at: data/services-details.json");
-        var services = await _httpClient.GetFromJsonAsync<Dictionary<string, Service>>("/data/services-details.json");
+        _logger?.LogInformation("Fetching services from API");
+        var services = await _httpClient.GetFromJsonAsync<List<Service>>("api/services");
 
         if (services == null)
         {
-          _logger?.LogWarning("JSON file loaded, but services came back null");
-          return new Dictionary<string, Service>();
+          _logger?.LogWarning("API call successful, but services came back null");
+          return new List<Service>();
         }
 
-        _logger?.LogInformation($"Successfully loaded {services.Count} services from JSON file");
+        _logger?.LogInformation($"Successfully loaded {services.Count} services from API");
         _cachedServices = services;
         return _cachedServices;
       }
       catch (Exception ex)
       {
-        _logger?.LogError(ex, "Error loading services from JSON: {Message}", ex.Message);
-        return new Dictionary<string, Service>();
+        _logger?.LogError(ex, "Error loading services from API: {Message}", ex.Message);
+        return new List<Service>();
       }
     }
 
-    // Obtém um serviço específico pelo ID
-    public async Task<ServiceDetailsViewModel?> GetServiceDetailsAsync(string serviceId)
+    // Obtém um serviço específico pelo key
+    public async Task<ServiceDetailsViewModel?> GetServiceDetailsAsync(string serviceKey)
     {
-      var services = await GetAllServicesAsync();
-      if (!services.TryGetValue(serviceId, out var service))
-        return null;
-
-      return new ServiceDetailsViewModel
+      try
       {
-        Id = serviceId,
-        Service = service,
-        GradientClasses = GetGradientClasses(serviceId),
-        IconColor = GetIconColor(serviceId),
-        HoverBorderColor = GetHoverBorderColor(serviceId),
-        ImageUrl = GetServiceImageUrl(serviceId)
-      };
+        _logger?.LogInformation($"Fetching service details for key: {serviceKey}");
+        var service = await _httpClient.GetFromJsonAsync<Service>($"api/services/key/{serviceKey}");
+
+        if (service == null)
+        {
+          _logger?.LogWarning($"Service with key {serviceKey} not found");
+          return null;
+        }
+
+        return new ServiceDetailsViewModel
+        {
+          Id = service.Key,
+          Service = service,
+          GradientClasses = GetGradientClasses(service.Key),
+          IconColor = GetIconColor(service.Key),
+          HoverBorderColor = GetHoverBorderColor(service.Key),
+          ImageUrl = GetServiceImageUrl(service.Key)
+        };
+      }
+      catch (Exception ex)
+      {
+        _logger?.LogError(ex, "Error fetching service details: {Message}", ex.Message);
+
+        var services = await GetAllServicesAsync();
+        var service = services.FirstOrDefault(s => s.Key == serviceKey);
+
+        if (service == null)
+          return null;
+
+        return new ServiceDetailsViewModel
+        {
+          Id = service.Key,
+          Service = service,
+          GradientClasses = GetGradientClasses(service.Key),
+          IconColor = GetIconColor(service.Key),
+          HoverBorderColor = GetHoverBorderColor(service.Key),
+          ImageUrl = GetServiceImageUrl(service.Key)
+        };
+      }
     }
 
     // Obtém cards para o catálogo
@@ -66,14 +94,14 @@ namespace front__wasm.Services
     {
       var services = await GetAllServicesAsync();
 
-      return services.Select(kvp => new ServiceCardViewModel
+      return services.Select(service => new ServiceCardViewModel
       {
-        Id = kvp.Key,
-        Title = kvp.Value.Title,
-        Description = kvp.Value.Description,
-        ImageUrl = GetServiceImageUrl(kvp.Key),
-        Price = GetServicePrice(kvp.Value),
-        GlowColor = GetGlowColor(kvp.Key)
+        Id = service.Key,
+        Title = service.Title,
+        Description = service.Description,
+        ImageUrl = GetServiceImageUrl(service.Key),
+        Price = GetServicePrice(service),
+        GlowColor = GetGlowColor(service.Key)
       }).ToList();
     }
 
