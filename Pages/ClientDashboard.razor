@@ -1,115 +1,139 @@
 @page "/client-dashboard"
 
+@using System.Globalization
+@using front__wasm.Models
+@using front__wasm.Services
+@inject DashboardService DashboardService
+@inject AuthService AuthService
+@inject NavigationManager NavigationManager
+@inject ILogger<ClientDashboard> Logger
+
 <div class="container mx-auto px-4 py-10">
     <h1 class="text-3xl font-bold mb-8 text-center text-white">Minha Conta</h1>
 
-    <div class="bg-[#1e1e18] rounded-lg shadow-lg p-6 mb-8">
-        <h2 class="text-xl font-semibold text-white mb-4">Filtrar por data, código, serviço</h2>
-        <div class="flex flex-col md:flex-row gap-4 mb-4">
-            <input type="date" class="px-3 py-2 rounded bg-[#2a2a24] text-white" @bind="startDate" />
-            <span class="text-white self-center">até</span>
-            <input type="date" class="px-3 py-2 rounded bg-[#2a2a24] text-white" @bind="endDate" />
-            <input type="text" class="px-3 py-2 rounded bg-[#2a2a24] text-white" placeholder="Buscar código..."
-                @bind-value="searchOrderCode" @bind-value:event="oninput" />
-            <input type="text" class="px-3 py-2 rounded bg-[#2a2a24] text-white" placeholder="Buscar serviço..."
-                @bind-value="searchService" @bind-value:event="oninput" />
+    @if (isLoading)
+    {
+        <div class="flex justify-center items-center py-12">
+            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#f1c533]"></div>
         </div>
-    </div>
+    }
+    else
+    {
+        <div class="bg-[#1e1e18] rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-xl font-semibold text-white mb-4">Filtrar por data, código, serviço</h2>
+            <div class="flex flex-col md:flex-row gap-4 mb-4">
+                <input type="date" class="px-3 py-2 rounded bg-[#2a2a24] text-white" @bind="startDate" />
+                <span class="text-white self-center">até</span>
+                <input type="date" class="px-3 py-2 rounded bg-[#2a2a24] text-white" @bind="endDate" />
+                <input type="text" class="px-3 py-2 rounded bg-[#2a2a24] text-white" placeholder="Buscar código..."
+                    @bind-value="searchOrderCode" @bind-value:event="oninput" />
+                <input type="text" class="px-3 py-2 rounded bg-[#2a2a24] text-white" placeholder="Buscar serviço..."
+                    @bind-value="searchService" @bind-value:event="oninput" />
+            </div>
+        </div>
 
-    <div class="bg-[#1e1e18] rounded-lg shadow-lg p-6">
-        <h2 class="text-xl font-semibold text-white mb-4">Histórico de Compras</h2>
-        @if (filteredOrders.Count == 0)
-        {
-            <p class="text-gray-400">Nenhuma compra encontrada nesse período.</p>
-        }
-        else
-        {
-            <table class="min-w-full text-white">
-                <thead>
-                    <tr>
-                        <th class="py-2 px-4 text-left">Código</th>
-                        <th class="py-2 px-4 text-left">Serviço</th>
-                        <th class="py-2 px-4 text-right cursor-pointer select-none"
-                            @onclick="() => CycleSort(nameof(OrderMock.Price))">
-                            Valor
-                            <span>
-                                @if (sortColumn == nameof(OrderMock.Price))
-                                {
-                                    @if (sortDirection == SortDirection.Ascending)
-                                    {
-                                        <span title="Ordenar crescente" class="ml-1 text-xs align-middle">&#8593;</span>
-                                    }
-                                    else if (sortDirection == SortDirection.Descending)
-                                    {
-                                        <span title="Ordenar decrescente" class="ml-1 text-xs align-middle">&#8595;</span>
-                                    }
-                                    else
-                                    {
-                                        <span title="Sem ordenação" class="ml-1 text-xs align-middle">&#8722;</span>
-                                    }
-                                }
-                                else
-                                {
-                                    <span class="opacity-50 ml-1 text-xs align-middle" title="Sem ordenação">&#8722;</span>
-                                }
-                            </span>
-                        </th>
-                        <th class="py-2 px-4 text-right cursor-pointer select-none"
-                            @onclick="() => CycleSort(nameof(OrderMock.Date))">
-                            Data
-                            <span>
-                                @if (sortColumn == nameof(OrderMock.Date))
-                                {
-                                    @if (sortDirection == SortDirection.Ascending)
-                                    {
-                                        <span title="Ordenar crescente" class="ml-1 text-xs align-middle">&#8593;</span>
-                                    }
-                                    else if (sortDirection == SortDirection.Descending)
-                                    {
-                                        <span title="Ordenar decrescente" class="ml-1 text-xs align-middle">&#8595;</span>
-                                    }
-                                    else
-                                    {
-                                        <span title="Sem ordenação" class="ml-1 text-xs align-middle">&#8722;</span>
-                                    }
-                                }
-                                else
-                                {
-                                    <span class="opacity-50 ml-1 text-xs align-middle" title="Sem ordenação">&#8722;</span>
-                                }
-                            </span>
-                        </th>
-                        <th class="py-2 px-4 text-center">Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var order in filteredOrders)
-                    {
-                        <tr class="border-b border-gray-700">
-                            <td class="py-2 px-4">@order.OrderCode</td>
-                            <td class="py-2 px-4">@order.ServiceName</td>
-                            <td class="py-2 px-4 text-right">R$ @order.Price.ToString("F2")</td>
-                            <td class="py-2 px-4 text-right">@order.Date.ToString("dd/MM/yyyy")</td>
-                            <td class="py-2 px-4">
-                                <div class="flex justify-center">
-                                    <button class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded">Comprar
-                                        novamente</button>
-                                </div>
-                            </td>
+        <div class="bg-[#1e1e18] rounded-lg shadow-lg p-6">
+            <h2 class="text-xl font-semibold text-white mb-4">Histórico de Compras</h2>
+            @if (filteredOrders.Count == 0)
+            {
+                <p class="text-gray-400">Nenhuma compra encontrada nesse período.</p>
+            }
+            else
+            {
+                <table class="min-w-full text-white">
+                    <thead>
+                        <tr>
+                            <th class="py-2 px-4 text-left">Código</th>
+                            <th class="py-2 px-4 text-left">Serviço</th>
+                            <th class="py-2 px-4 text-right cursor-pointer select-none"
+                                @onclick="() => CycleSort(nameof(SellResponse.Amount))">
+                                Valor
+                                @RenderSortIcon(nameof(SellResponse.Amount))
+                            </th>
+                            <th class="py-2 px-4 text-right cursor-pointer select-none"
+                                @onclick="() => CycleSort(nameof(SellResponse.CreatedAt))">
+                                Data
+                                @RenderSortIcon(nameof(SellResponse.CreatedAt))
+                            </th>
+                            <th class="py-2 px-4 text-center">Status</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
-        }
-    </div>
+                    </thead>
+                    <tbody>
+                        @foreach (var order in pagedOrders)
+                        {
+                            <tr class="border-b border-gray-700">
+                                <td class="py-2 px-4">
+                                    <span title="@order.Id" class="cursor-help">
+                                        @order.Id
+                                    </span>
+                                </td>
+                                <td class="py-2 px-4">@order.ServiceTitle</td>
+                                <td class="py-2 px-4 text-right">R$ @order.Amount.ToString("F2")</td>
+                                <td class="py-2 px-4 text-right">@order.CreatedAt.ToString("dd/MM/yyyy")</td>
+                                <td class="py-2 px-4 text-center">
+                                    <span class="@GetStatusClass(order.Status) px-2 py-1 text-xs rounded-full">
+                                        @GetStatusText(order.Status)
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                
+                <div class="mt-6 flex flex-wrap items-center justify-between">
+                    <div class="text-sm text-gray-400 mb-2 md:mb-0">
+                        Mostrando @((currentPage - 1) * pageSize + 1)-@(Math.Min(currentPage * pageSize, filteredOrders.Count)) de @filteredOrders.Count registros
+                    </div>
+                    
+                    <div class="flex items-center">
+                        <span class="mr-2 text-sm text-gray-400">Itens por página:</span>
+                        <select @bind="pageSize" class="bg-[#2a2a24] text-white border border-gray-600 rounded px-2 py-1 text-sm mr-4">
+                            @foreach (var size in pageSizeOptions)
+                            {
+                                <option value="@size">@size</option>
+                            }
+                        </select>
+                        
+                        <div class="flex space-x-1">
+                            @RenderPaginationButton("&laquo;", () => PreviousPage(), currentPage == 1)
+                            @RenderPaginationControls()
+                            @RenderPaginationButton("&raquo;", () => NextPage(), currentPage >= totalPages)
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
 </div>
 
 @code {
+    // Variáveis de filtro
     private DateTime? _startDate;
     private DateTime? _endDate;
     private string _searchService = string.Empty;
     private string _searchOrderCode = string.Empty;
+    
+    // Variáveis de estado
+    private bool isLoading = true;
+    private List<SellResponse> allOrders = new();
+    private List<SellResponse> filteredOrders = new();
+    
+    // Variáveis de ordenação
+    private string? sortColumn = null;
+    private SortDirection sortDirection = SortDirection.None;
+    
+    // Variáveis de paginação
+    private int currentPage = 1;
+    private int pageSize = 10;
+    private int totalPages => (int)Math.Ceiling(filteredOrders.Count / (double)pageSize);
+    private List<SellResponse> pagedOrders => filteredOrders
+        .Skip((currentPage - 1) * pageSize)
+        .Take(pageSize)
+        .ToList();
+    private int[] pageSizeOptions = new[] { 5, 10, 15, 25, 50 };
+    private const int MaxVisiblePages = 5;
 
+    // Propriedades para modificar os filtros
     private DateTime? startDate
     {
         get => _startDate;
@@ -122,6 +146,7 @@
             }
         }
     }
+    
     private DateTime? endDate
     {
         get => _endDate;
@@ -134,6 +159,7 @@
             }
         }
     }
+    
     private string searchService
     {
         get => _searchService;
@@ -146,6 +172,7 @@
             }
         }
     }
+    
     private string searchOrderCode
     {
         get => _searchOrderCode;
@@ -159,37 +186,67 @@
         }
     }
 
-    private List<OrderMock> allOrders = new()
-{
-new OrderMock { OrderCode = "A123", ServiceName = "Ouro 100k", Price = 25.00m, Date = DateTime.Today.AddDays(-1) },
-new OrderMock { OrderCode = "B456", ServiceName = "Boost Dungeon", Price = 50.00m, Date = DateTime.Today.AddDays(-10) },
-new OrderMock { OrderCode = "C789", ServiceName = "Raid Heroica", Price = 120.00m, Date = DateTime.Today.AddDays(-20) }
-};
-    private List<OrderMock> filteredOrders = new();
-
-    private string? sortColumn = null;
-    private SortDirection sortDirection = SortDirection.None;
-
-    protected override void OnInitialized()
+    // Inicializa a página e carrega dados
+    protected override async Task OnInitializedAsync()
     {
-        ApplyFilter();
+        try
+        {
+            await AuthService.InitializeAsync();
+            
+            // Verificar se o usuário está autenticado
+            if (!AuthService.IsAuthenticated)
+            {
+                NavigationManager.NavigateTo("/login");
+                return;
+            }
+            
+            await LoadOrders();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Erro ao inicializar o painel");
+        }
     }
 
+    // Carrega os pedidos da API
+    private async Task LoadOrders()
+    {
+        try
+        {
+            isLoading = true;
+            allOrders = await DashboardService.GetMyPurchasesAsync();
+            ApplyFilter();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Erro ao carregar pedidos");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    // Aplica filtros aos pedidos
     private void ApplyFilter()
     {
-        IEnumerable<OrderMock> query = allOrders
-        .Where(o =>
-        (!startDate.HasValue || o.Date >= startDate.Value) &&
-        (!endDate.HasValue || o.Date <= endDate.Value) &&
-        (string.IsNullOrWhiteSpace(searchService) || o.ServiceName.Contains(searchService, StringComparison.OrdinalIgnoreCase))
-        &&
-        (string.IsNullOrWhiteSpace(searchOrderCode) || o.OrderCode.Contains(searchOrderCode,
-        StringComparison.OrdinalIgnoreCase))
-        );
+        if (allOrders == null) return;
+        
+        IEnumerable<SellResponse> query = allOrders
+            .Where(o =>
+                (!startDate.HasValue || o.CreatedAt.Date >= startDate.Value.Date) &&
+                (!endDate.HasValue || o.CreatedAt.Date <= endDate.Value.Date) &&
+                (string.IsNullOrWhiteSpace(searchService) || 
+                 (o.ServiceTitle != null && o.ServiceTitle.Contains(searchService, StringComparison.OrdinalIgnoreCase))) &&
+                (string.IsNullOrWhiteSpace(searchOrderCode) || 
+                 o.Id.Contains(searchOrderCode, StringComparison.OrdinalIgnoreCase))
+            );
 
         filteredOrders = SortOrders(query.ToList());
+        currentPage = 1;
     }
 
+    // Alterna entre os tipos de ordenação ao clicar nas colunas
     private void CycleSort(string column)
     {
         if (sortColumn != column)
@@ -207,34 +264,196 @@ new OrderMock { OrderCode = "C789", ServiceName = "Raid Heroica", Price = 120.00
                 _ => SortDirection.None
             };
         }
+        
         filteredOrders = SortOrders(filteredOrders);
     }
 
-    private List<OrderMock> SortOrders(List<OrderMock> orders)
+    // Ordena a lista de pedidos conforme a coluna selecionada
+    private List<SellResponse> SortOrders(List<SellResponse> orders)
     {
         if (sortDirection == SortDirection.None || string.IsNullOrEmpty(sortColumn))
             return orders;
 
         return sortColumn switch
         {
-            nameof(OrderMock.Date) => sortDirection == SortDirection.Ascending
-            ? orders.OrderBy(o => o.Date).ToList()
-            : orders.OrderByDescending(o => o.Date).ToList(),
-            nameof(OrderMock.Price) => sortDirection == SortDirection.Ascending
-            ? orders.OrderBy(o => o.Price).ToList()
-            : orders.OrderByDescending(o => o.Price).ToList(),
+            nameof(SellResponse.CreatedAt) => sortDirection == SortDirection.Ascending
+                ? orders.OrderBy(o => o.CreatedAt).ToList()
+                : orders.OrderByDescending(o => o.CreatedAt).ToList(),
+            nameof(SellResponse.Amount) => sortDirection == SortDirection.Ascending
+                ? orders.OrderBy(o => o.Amount).ToList()
+                : orders.OrderByDescending(o => o.Amount).ToList(),
             _ => orders
         };
     }
 
-    public class OrderMock
+    // Retorna o texto do status conforme o código
+    private string GetStatusText(int status) => status switch
     {
-        public string OrderCode { get; set; } = "";
-        public string ServiceName { get; set; } = "";
-        public decimal Price { get; set; }
-        public DateTime Date { get; set; }
+        0 => "Pendente",
+        1 => "Concluído",
+        2 => "Cancelado",
+        3 => "Reembolsado",
+        _ => "Desconhecido"
+    };
+
+    // Retorna a classe CSS para formatar o status
+    private string GetStatusClass(int status) => status switch
+    {
+        0 => "bg-yellow-200 text-yellow-800",
+        1 => "bg-green-200 text-green-800",
+        2 => "bg-red-200 text-red-800",
+        3 => "bg-purple-200 text-purple-800",
+        _ => "bg-gray-200 text-gray-800"
+    };
+    
+    // Renderiza o ícone de ordenação para as colunas da tabela
+    private RenderFragment RenderSortIcon(string column) => builder =>
+    {
+        builder.OpenElement(0, "span");
+        
+        bool isActiveColumn = sortColumn == column;
+        string title;
+        string icon;
+        string classes = "ml-1 text-xs align-middle";
+
+        if (isActiveColumn)
+        {
+            switch (sortDirection)
+            {
+                case SortDirection.Ascending:
+                    title = "Ordenar crescente";
+                    icon = "&#8593;";
+                    break;
+                case SortDirection.Descending:
+                    title = "Ordenar decrescente";
+                    icon = "&#8595;";
+                    break;
+                default:
+                    title = "Sem ordenação";
+                    icon = "&#8722;";
+                    break;
+            }
+        }
+        else
+        {
+            title = "Sem ordenação";
+            icon = "&#8722;";
+            classes += " opacity-50";
+        }
+
+        builder.AddAttribute(1, "title", title);
+        builder.AddAttribute(2, "class", classes);
+        builder.AddMarkupContent(3, icon);
+        
+        builder.CloseElement();
+    };
+
+    // Renderiza um botão de paginação com texto/ícone personalizado
+    private RenderFragment RenderPaginationButton(string content, Action onClick, bool disabled) => builder =>
+    {
+        builder.OpenElement(0, "button");
+        builder.AddAttribute(1, "onclick", EventCallback.Factory.Create(this, onClick));
+        builder.AddAttribute(2, "disabled", disabled);
+        
+        string buttonClass = "px-3 py-1 rounded ";
+        buttonClass += disabled 
+            ? "bg-gray-700 text-gray-500 cursor-not-allowed" 
+            : "bg-gray-700 hover:bg-gray-600 text-white";
+            
+        builder.AddAttribute(3, "class", buttonClass);
+        builder.AddMarkupContent(4, content);
+        
+        builder.CloseElement();
+    };
+
+    // Renderiza o conjunto completo de controles de paginação
+    private RenderFragment RenderPaginationControls() => builder =>
+    {
+        var (startPage, endPage) = CalculateVisiblePageRange();
+
+        // Primeiro botão e elipses
+        if (startPage > 1)
+        {
+            // Botão para a página 1
+            builder.AddContent(0, RenderPaginationButton("1", () => GoToPage(1), false));
+            
+            // Elipses se necessário
+            if (startPage > 2)
+            {
+                builder.OpenElement(1, "span");
+                builder.AddAttribute(2, "class", "px-2 py-1 text-gray-400");
+                builder.AddContent(3, "...");
+                builder.CloseElement();
+            }
+        }
+        
+        // Botões para o intervalo de páginas visíveis
+        for (int i = startPage; i <= endPage; i++)
+        {
+            int pageNumber = i;
+            string buttonClass = "px-3 py-1 rounded " + 
+                                (pageNumber == currentPage ? "bg-blue-600" : "bg-gray-700 hover:bg-gray-600") +
+                                " text-white";
+            
+            builder.OpenElement(4, "button");
+            builder.AddAttribute(5, "onclick", EventCallback.Factory.Create<MouseEventArgs>(this, () => GoToPage(pageNumber)));
+            builder.AddAttribute(6, "class", buttonClass);
+            builder.AddContent(7, pageNumber.ToString());
+            builder.CloseElement();
+        }
+        
+        // Último botão e elipses
+        if (endPage < totalPages)
+        {
+            // Elipses se necessário
+            if (endPage < totalPages - 1)
+            {
+                builder.OpenElement(8, "span");
+                builder.AddAttribute(9, "class", "px-2 py-1 text-gray-400");
+                builder.AddContent(10, "...");
+                builder.CloseElement();
+            }
+            
+            // Botão para a última página
+            builder.AddContent(11, RenderPaginationButton(totalPages.ToString(), () => GoToPage(totalPages), false));
+        }
+    };
+
+    // Calcula o intervalo de páginas a serem exibidas na paginação
+    private (int startPage, int endPage) CalculateVisiblePageRange()
+    {
+        int startPage = Math.Max(1, currentPage - MaxVisiblePages / 2);
+        int endPage = Math.Min(totalPages, startPage + MaxVisiblePages - 1);
+        
+        // Ajusta startPage se não há páginas suficientes no final
+        if (endPage - startPage + 1 < MaxVisiblePages)
+        {
+            startPage = Math.Max(1, endPage - MaxVisiblePages + 1);
+        }
+        
+        return (startPage, endPage);
     }
 
+    // Métodos de paginação
+    private void GoToPage(int page)
+    {
+        if (page >= 1 && page <= totalPages)
+            currentPage = page;
+    }
+
+    private void PreviousPage()
+    {
+        if (currentPage > 1)
+            currentPage--;
+    }
+
+    private void NextPage()
+    {
+        if (currentPage < totalPages)
+            currentPage++;
+    }
+
+    // Enum para direção da ordenação
     public enum SortDirection
     {
         None,

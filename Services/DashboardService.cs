@@ -46,6 +46,36 @@ namespace front__wasm.Services
       }
     }
 
+    // Get user's purchases
+    public async Task<List<SellResponse>> GetMyPurchasesAsync()
+    {
+      try
+      {
+        _logger?.LogInformation("Fetching user's purchases");
+
+        await EnsureAuthHeaderAsync();
+        var response = await _httpClient.GetAsync("api/sells/my-purchases");
+
+        if (response.IsSuccessStatusCode)
+        {
+          var purchases = await response.Content.ReadFromJsonAsync<List<SellResponse>>();
+          _logger?.LogInformation($"Successfully fetched {purchases?.Count ?? 0} user purchases");
+          return purchases ?? new List<SellResponse>();
+        }
+        else
+        {
+          var error = await response.Content.ReadAsStringAsync();
+          _logger?.LogWarning($"Failed to get user purchases: {response.StatusCode}, {error}");
+          return new List<SellResponse>();
+        }
+      }
+      catch (Exception ex)
+      {
+        _logger?.LogError(ex, "Error fetching user purchases");
+        return new List<SellResponse>();
+      }
+    }
+
     // Get sell by ID (Admin only)
     public async Task<SellResponse?> GetSellByIdAsync(string sellId)
     {
