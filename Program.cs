@@ -47,6 +47,16 @@ builder.Services.AddScoped(sp =>
   return new ServiceManager(httpClient, logger);
 });
 
+// Register DashboardService
+builder.Services.AddScoped(sp =>
+{
+  var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
+  var httpClient = httpClientFactory.CreateClient("ApiClient");
+  var authService = sp.GetRequiredService<AuthService>();
+  var logger = sp.GetService<ILogger<DashboardService>>();
+  return new DashboardService(httpClient, authService, logger);
+});
+
 builder.Logging.SetMinimumLevel(LogLevel.Debug);
 
 await builder.Build().RunAsync();
