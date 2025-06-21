@@ -5,6 +5,9 @@
 @using front__wasm.Services
 @using front__wasm.Models
 @inject CartService CartService
+@inject CheckoutService CheckoutService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
 
 <div class="container mx-auto px-4 py-8 md:py-12">
   <h1 class="text-3xl md:text-4xl font-bold mb-6 md:mb-8 text-center text-gray-200">Carrinho de Compras</h1>
@@ -63,10 +66,15 @@
   Message="@($"Tem certeza que deseja remover '{itemToDelete?.Title}' do carrinho?")" OnConfirm="@ConfirmDeleteItem"
   OnCancel="@CancelDeleteItem" />
 
+<PaymentConfirmationDialog IsVisible="@showPaymentConfirmation" SellData="@lastSell" OnClose="@HandlePaymentDialogClose"
+  OnViewOrders="@GoToOrders" />
+
 @code {
   private bool showCheckoutConfirmation = false;
   private bool showDeleteConfirmation = false;
+  private bool showPaymentConfirmation = false;
   private CartItemModel? itemToDelete = null;
+  private SellCreateResponse? lastSell;
 
   private void UpdateQuantity(CartItemModel item, int newQuantity)
   {
@@ -99,15 +107,40 @@
     return CartService.GetSubtotal();
   }
 
-  private void HandleCheckout()
+  private async Task HandleCheckout()
   {
-    showCheckoutConfirmation = true;
+    try
+    {
+      var result = await CheckoutService.CreateSellAsync("PIX");
+
+      if (result != null)
+      {
+        lastSell = result;
+        CartService.ClearCart();
+        showPaymentConfirmation = true;
+      }
+    }
+    catch (Exception ex)
+    {
+      Console.WriteLine($"Erro no checkout: {ex.Message}");
+    }
   }
 
   private void HandleCheckoutConfirmationClose()
   {
     showCheckoutConfirmation = false;
     CartService.ClearCart();
+  }
+
+  private void HandlePaymentDialogClose()
+  {
+    showPaymentConfirmation = false;
+    NavigationManager.NavigateTo("/catalog");
+  }
+
+  private void GoToOrders()
+  {
+    NavigationManager.NavigateTo("/client-dashboard");
   }
 
   private string GetImageUrl(string title)

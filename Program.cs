@@ -57,6 +57,17 @@ builder.Services.AddScoped(sp =>
   return new DashboardService(httpClient, authService, logger);
 });
 
+// Register CheckoutService
+builder.Services.AddScoped(sp =>
+{
+  var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
+  var httpClient = httpClientFactory.CreateClient("ApiClient");
+  var authService = sp.GetRequiredService<AuthService>();
+  var cartService = sp.GetRequiredService<CartService>();
+  var logger = sp.GetService<ILogger<CheckoutService>>();
+  return new CheckoutService(httpClient, authService, cartService, logger);
+});
+
 builder.Logging.SetMinimumLevel(LogLevel.Debug);
 
 await builder.Build().RunAsync();

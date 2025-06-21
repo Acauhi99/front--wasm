@@ -1,4 +1,8 @@
 @using front__wasm.Services
+@using front__wasm.Models
+
+@inject CheckoutService CheckoutService
+@inject NavigationManager NavigationManager
 
 @code {
     [Parameter]
@@ -11,6 +15,9 @@
     public EventCallback OnCheckoutClicked { get; set; }
 
     [Parameter]
+    public EventCallback<SellCreateResponse> OnCheckoutCompleted { get; set; }
+
+    [Parameter]
     public bool IsLoading { get; set; } = false;
 
     private decimal Total => Subtotal + ServiceFee;
@@ -18,13 +25,22 @@
     private async Task HandleCheckout()
     {
         if (!IsLoading && Subtotal > 0)
+        {
             await OnCheckoutClicked.InvokeAsync();
+
+            var result = await CheckoutService.CreateSellAsync("PIX");
+
+            if (result != null)
+            {
+                await OnCheckoutCompleted.InvokeAsync(result);
+            }
+        }
     }
 }
 
 <div class="bg-[#2d2d25] rounded-lg shadow-xl p-4 md:p-6 border border-gray-700 lg:sticky lg:top-4 mb-6 lg:mb-0">
     <h2 class="text-xl md:text-2xl font-bold mb-6 text-center text-gray-200">Resumo do Pedido</h2>
-    
+
     <div class="space-y-4 mb-6">
         <div class="flex justify-between text-gray-300">
             <span>Subtotal</span>
@@ -39,18 +55,19 @@
             <span class="font-bold text-yellow-400 text-xl">@CartService.FormatCurrency(Total)</span>
         </div>
     </div>
-    
-    <button 
-        @onclick="HandleCheckout"
-        disabled="@(Subtotal <= 0 || IsLoading)"
+
+    <button @onclick="HandleCheckout" disabled="@(Subtotal <= 0 || IsLoading)"
         class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
-        @if (IsLoading) {
+        @if (IsLoading)
+        {
             <span>Processando...</span>
-        } else {
+        }
+        else
+        {
             <span>Finalizar Compra</span>
         }
     </button>
-    
+
     <div class="mt-6 text-sm text-gray-400">
         <p class="mb-2">Métodos de Pagamento Aceitos:</p>
         <div class="flex flex-wrap gap-2">
